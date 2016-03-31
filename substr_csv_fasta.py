@@ -3,6 +3,7 @@
 import os
 import sys
 import csv
+from time import time
 from Bio import SeqIO
 from Bio.Seq import Seq
 from Bio.SeqRecord import SeqRecord
@@ -11,6 +12,8 @@ from Bio.Alphabet import Alphabet
 if len(sys.argv) < 2:
     print('Usage: ', str(sys.argv[0]), '[CSV FILE] [FASTA FILE]')
 else:
+    start_time = time()
+
     csv_file = str(sys.argv[1])
     fasta_file = str(sys.argv[2])
 
@@ -42,3 +45,7 @@ else:
 
     output.close()
     records.close()
+
+    end_time = time()
+
+    print('Took %.3f seconds...\n' % (end_time - start_time))
