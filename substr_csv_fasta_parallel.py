@@ -3,7 +3,7 @@
 import os
 import sys
 import csv
-import concurrent.futures
+import pandas
 from concurrent.futures import ProcessPoolExecutor
 from time import time
 from Bio import SeqIO
@@ -12,59 +12,73 @@ from Bio.SeqRecord import SeqRecord
 from Bio.Alphabet import Alphabet
 
 
-def slicing(record):
-    print('\nProcessing', record['id'], 'of size', len(record['record']), 'starting in', record['begin'], 'ending', record['end'])
+def slicing(data):
+    id, begin, end, record = data['id'], data['begin'], data['end'], data['record']
 
-    if record['begin'] < record['end']:
+    print('\nProcessing', id, 'of size', len(record), 'starting in', begin, 'ending', end)
+
+    if begin < end:
         print('Normal Slicing...')
-        seq = record['record'].seq[record['begin']:record['end']]
+        seq = record.seq[begin:end]
     else:
         print('Reverse Complement...')
-        seq = record['record'].seq[record['end']:record['begin']].reverse_complement()
+        seq = record.seq[end:begin].reverse_complement()
 
-    header = '%s|size%s[%s_to_%s](%s nts)' % (record['id'], len(record['record']), record['begin'], record['end'], len(seq))
+    header = '%s|size%s[%s_to_%s](%s nts)' % (id, len(record), begin, end, len(seq))
 
     return SeqRecord(Seq(str(seq), Alphabet()), id=str(header), description='')
 
-if len(sys.argv) < 2:
-    print('Usage: ', str(sys.argv[0]), '[CSV FILE] [FASTA FILE]')
-else:
-    start_time = time()
 
-    csv_file = str(sys.argv[1])
-    fasta_file = str(sys.argv[2])
+def main():
+    if len(sys.argv) < 2:
+        print('Usage: ', str(sys.argv[0]), '[CSV FILE] [FASTA FILE]')
+    else:
+        start_time = time()
 
-    records = SeqIO.index(fasta_file, 'fasta')
-    output = open(os.path.splitext(sys.argv[2])[0] + '.result.fasta', 'w')
-    results = []
-    datas = []
+        csv_file = str(sys.argv[1])
+        fasta_file = str(sys.argv[2])
 
-    pool = ProcessPoolExecutor(max_workers=1)
+        print('\nUsing CSV', csv_file, 'and FASTA', fasta_file)
 
-    print('Using', csv_file, 'CSV Table and', fasta_file, 'FASTA File')
+        records = SeqIO.index(fasta_file, 'fasta')
+        output = open(os.path.splitext(sys.argv[2])[0] + '.result.fasta', 'w')
+        pool = ProcessPoolExecutor()
+        results = []
+        data = []
 
+        print('Reading CSV and FASTA File...')
 
-    with open(csv_file, 'r') as csv_file:
-        reader = csv.reader(csv_file)
+        create_start_time = time()
+
+        reader = list(pandas.read_csv(csv_file, header=None, index_col=None).values)
 
         for id, begin, end in reader:
-            data = {}
-            data['id'] = id
-            data['record'] = records[id]
-            data['begin'] = int(begin)
-            data['end'] = int(end)
+            register = {}
+            register['id'] = id
+            register['begin'] = int(begin)
+            register['end'] = int(end)
+            register['record'] = records[id]
 
-            datas.append(dict(data))
+            data.append(dict(register))
 
-    results = list(pool.map(slicing, datas))
+        create_end_time = time()
 
-    [SeqIO.write(result, output, 'fasta') for result in results]
+        print('Create Registers Time:', (create_end_time - create_start_time))
 
-    print('\nCheck the results in ', os.path.splitext(sys.argv[2])[0], '.result.fasta\n', sep='')
+        print('Processing...')
 
-    output.close()
-    records.close()
+        results = list(pool.map(slicing, data))
 
-    end_time = time()
+        [SeqIO.write(result, output, 'fasta') for result in results]
 
-    print('Took %.3f seconds...\n' % (end_time - start_time))
+        print('\nCheck the results in ', os.path.splitext(sys.argv[2])[0], '.result.fasta\n', sep='')
+
+        output.close()
+        records.close()
+
+        end_time = time()
+
+        print('Took %.3f seconds...\n' % (end_time - start_time))
+
+if __name__ == '__main__':
+    main()
