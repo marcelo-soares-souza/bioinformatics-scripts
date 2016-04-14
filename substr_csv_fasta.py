@@ -9,7 +9,7 @@ from Bio.Seq import Seq
 from Bio.SeqRecord import SeqRecord
 from Bio.Alphabet import Alphabet
 
-if len(sys.argv) < 2:
+if len(sys.argv) < 3:
     print('Usage: ', str(sys.argv[0]), '[CSV FILE] [FASTA FILE]')
 else:
     start_time = time()
