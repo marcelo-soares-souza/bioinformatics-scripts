@@ -10,23 +10,31 @@ from Bio.Seq import Seq
 from Bio.SeqRecord import SeqRecord
 from Bio.Alphabet import Alphabet
 
-if len(sys.argv) < 3:
-    print('Usage:', str(sys.argv[0]), '[CSV FILE] [FASTA FILE]')
+if len(sys.argv) < 4:
+    print('Usage:', str(sys.argv[0]), '[CSV FILE] [FASTA FILE] [UPSTREAM/DOWNSTREAM VALUE')
 else:
     start_time = time()
 
     csv_file = str(sys.argv[1])
     fasta_file = str(sys.argv[2])
+    up_down_value = int(sys.argv[3])
 
     records = SeqIO.index(fasta_file, 'fasta')
     output = open(os.path.splitext(sys.argv[2])[0] + '.result.' + datetime.datetime.now().strftime('%Y%m%d') + '.fasta', 'w')
 
-    print('Using', csv_file, 'CSV Table and', fasta_file, 'FASTA File')
+    print('Using', csv_file, 'CSV Table and', fasta_file, 'FASTA File', 'With Up/Down Stream of', up_down_value)
 
     with open(csv_file, 'r') as csv_file:
         reader = csv.reader(csv_file)
 
         for id, begin, end in reader:
+            if int(begin) < int(end):
+                begin = int(begin) - up_down_value
+                end = int(end) + up_down_value
+            else:
+                begin = int(begin) + up_down_value
+                end = int(end) - up_down_value
+
             print('\nProcessing', id, 'of size', len(records[id]), 'starting in', begin, 'ending', end)
 
             if int(begin) < int(end):
