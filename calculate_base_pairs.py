@@ -34,24 +34,17 @@ else:
 
             result[id].append([start, end])
 
-    result = dict(result)
+    result = sorted(dict(result).items())
 
-    for k, v in result.items():
+    for k, v in result:
         s = sorted(v)
 
         min_value = min(sum(s, []))
         max_value = max(sum(s, []))
 
-        # print('Min Value', min_value, 'Max Value', max_value)
-        # print('\n\n')
-
         x = set(range(min_value, max_value))
 
         initial_size = len(x)
-
-        # print("X:", x)
-
-        # print('\n\n')
 
         for y in s:
           y = set(range(y[0], y[1]))
@@ -63,4 +56,4 @@ else:
 
     end_time = time()
 
-    print('Took %.3f seconds...\n' % (end_time - start_time))
+    print('\nTook %.3f seconds...\n' % (end_time - start_time))
