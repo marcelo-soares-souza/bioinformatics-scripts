@@ -11,34 +11,34 @@ from Bio.SeqRecord import SeqRecord
 from Bio.Alphabet import Alphabet
 
 if len(sys.argv) < 5:
-    print('Usage:', str(sys.argv[0]), '[CSV FILE] [FASTA FILE] [PIDENT] [QCOVS]')
+    print('Usage:', str(sys.argv[0]), '[CSV FILE] [FASTQ FILE] [PIDENT] [QCOVS]')
 else:
     start_time = time()
 
     csv_filename = str(sys.argv[1])
-    fasta_filename = str(sys.argv[2])
+    fastq_filename = str(sys.argv[2])
     arg_pident = float(sys.argv[3])
     arg_qcovs = float(sys.argv[4])
 
-    output_result_filename = os.path.splitext(sys.argv[2])[0] + '.result.' + datetime.datetime.now().strftime('%Y%m%d') + '.fasta'
-    output_removed_filename = os.path.splitext(sys.argv[2])[0] + '.removed.' + datetime.datetime.now().strftime('%Y%m%d') + '.fasta'
+    output_result_filename = os.path.splitext(sys.argv[2])[0] + '.clean.' + datetime.datetime.now().strftime('%Y%m%d') + '.fastq'
+    output_removed_filename = os.path.splitext(sys.argv[2])[0] + '.removed.' + datetime.datetime.now().strftime('%Y%m%d') + '.fastq'
 
     output_removed = open(output_removed_filename, 'w')
 
     write = False
     removed_sequences = 0
 
-    print('\nReading', fasta_filename, 'FASTA File')
-    records = SeqIO.to_dict(SeqIO.parse(fasta_filename, 'fasta'))
+    print('\nReading', fastq_filename, 'FASTQ File')
+    records = SeqIO.to_dict(SeqIO.parse(fastq_filename, 'fastq'))
 
-    print('\nUsing', csv_filename, 'CSV Table and', fasta_filename, 'FASTA File')
+    print('\nUsing', csv_filename, 'CSV Table and', fastq_filename, 'FASTQ File')
 
     with open(csv_filename, 'r') as csv_file:
         reader = csv.reader(csv_file, delimiter='\t')
 
         for data in reader:
-            print(data)
             id = data[0]
+            subject = data[2]
             pident = float(data[11])
             qcovs = float(data[14])
 
@@ -48,7 +48,7 @@ else:
                 if id in records.keys():
                     print('\nRemoving', id, 'with PIDENT', pident, 'and QCOVS', qcovs)
 
-                    SeqIO.write(records[id], output_removed, 'fasta')
+                    SeqIO.write(records[id], output_removed, 'fastq')
 
                     del records[id]
 
@@ -57,7 +57,7 @@ else:
 
     if write:
         output = open(output_result_filename, 'w')
-        [ SeqIO.write(record, output, 'fasta') for (id, record) in records.items() ]
+        [ SeqIO.write(record, output, 'fastq') for (id, record) in records.items() ]
         output.close()
         print('\nCheck the results in ', output_result_filename, '\n', sep='')
         print('Removed Sequences (',removed_sequences,') in ', output_removed_filename, '\n', sep='')
