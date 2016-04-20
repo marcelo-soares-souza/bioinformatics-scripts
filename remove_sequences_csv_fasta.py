@@ -42,16 +42,12 @@ else:
             pident = float(data[11])
             qcovs = float(data[14])
 
-            print('\nChecking', id, 'with PIDENT', pident, 'and QCOVS', qcovs)
-
             if pident >= arg_pident and qcovs >= arg_qcovs:
                 if id in records.keys():
 
                     print('\nRemoving', id, 'with PIDENT', pident, 'and QCOVS', qcovs)
-                    print(records[id].letter_annotations["phred_quality"])
-         
-                    header = '%s %s %s %s' % (id, subject, str(pident), str(qcovs))
 
+                    header = '%s %s %s %s' % (id, subject, str(pident), str(qcovs))
                     record = SeqRecord(Seq(str(records[id].seq), Alphabet()), id=str(header), description='')
                     record.letter_annotations["phred_quality"] = records[id].letter_annotations["phred_quality"]
 
@@ -62,10 +58,15 @@ else:
                     write = True
                     removed_sequences = removed_sequences + 1
 
+    output_removed.close()
+
+    print('Writing Results...')
+
     if write:
         output = open(output_result_filename, 'w')
         [ SeqIO.write(record, output, 'fastq') for (id, record) in records.items() ]
         output.close()
+
         print('\nCheck the results in ', output_result_filename, '\n', sep='')
         print('Removed Sequences (',removed_sequences,') in ', output_removed_filename, '\n', sep='')
     else:
@@ -74,5 +75,3 @@ else:
     end_time = time()
 
     print('Took %.3f seconds...\n' % (end_time - start_time))
-
-    output_removed.close()
