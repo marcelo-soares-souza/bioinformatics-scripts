@@ -46,6 +46,9 @@ else:
 
     result = sorted(dict(result).items())
 
+    output_filename = os.path.splitext(sys.argv[1])[0] + '.result.' + datetime.datetime.now().strftime('%Y%m%d') + '.txt'
+    output = open(output_filename, 'w')
+
     for k, v in result:
         s = sorted(v)
 
@@ -62,8 +65,13 @@ else:
 
         size = initial_size - len(x)
 
-        print('SSEQID:', k, 'SLEN:', info[k]['slen'], 'BPs:', size, 'PIDENT >=', arg_pident)
+        log = 'SSEQID: %s SLEN: %s BPs: %s PIDENT >= %s\n' % (str(k), str(info[k]['slen']), str(size), str(arg_pident))
+        print(log)
+        output.write(log)
+
+    output.close()
 
     end_time = time()
 
+    print('\nCheck the results in ', output_filename, '\n', sep='')
     print('\nTook %.3f seconds...\n' % (end_time - start_time))

@@ -53,7 +53,7 @@ else:
         print('\nRemoved Sequences (',removed_sequences,') in ', output_removed_filename, '\n', sep='')
     else:
         print('No sequences found\n')
-    
+
     end_time = time()
 
     print('Took %.3f seconds...\n' % (end_time - start_time))
