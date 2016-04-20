@@ -11,28 +11,38 @@ from Bio.Seq import Seq
 from Bio.SeqRecord import SeqRecord
 from Bio.Alphabet import Alphabet
 
-if len(sys.argv) < 2:
-    print('Usage:', str(sys.argv[0]), '[CSV FILE]')
+if len(sys.argv) < 3:
+    print('Usage:', str(sys.argv[0]), '[CSV FILE] [PIDENT]')
 else:
     start_time = time()
 
     csv_filename = str(sys.argv[1])
+    arg_pident = float(sys.argv[2])
 
-    print('Using', csv_filename)
+    print('Using', csv_filename, '\n')
 
     result = defaultdict(list)
+    info = defaultdict(dict)
 
     with open(csv_filename, 'r') as csv_data:
         reader = csv.reader(csv_data, delimiter='\t')
 
         for data in reader:
-            id = str(data[2])
-            start, end  = int(data[5]), int(data[6])
+            pident = float(data[11])
 
-            if start > end:
-              start, end = end, start
+            if pident >= arg_pident:
+                id = str(data[2])
+                slen = data[3]
+                start, end  = int(data[6]), int(data[7])
 
-            result[id].append([start, end])
+                if start > end:
+                    start, end = end, start
+
+                # print("id", id, "slen", slen, "start", start, "end", end, "pident", pident)
+                info[id]['slen'] = slen
+                info[id]['pident'] = pident
+
+                result[id].append([start, end])
 
     result = sorted(dict(result).items())
 
@@ -52,7 +62,7 @@ else:
 
         size = initial_size - len(x)
 
-        print(k, size)
+        print('SSEQID:', k, 'SLEN:', info[k]['slen'], 'BPs:', size, 'PIDENT >=', arg_pident)
 
     end_time = time()
 
