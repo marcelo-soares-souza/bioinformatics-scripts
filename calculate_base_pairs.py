@@ -46,7 +46,7 @@ else:
 
     result = sorted(dict(result).items())
 
-    output_filename = os.path.splitext(sys.argv[1])[0] + '.result.' + datetime.datetime.now().strftime('%Y%m%d') + '.txt'
+    output_filename = os.path.splitext(sys.argv[1])[0] + '.result-PIDENT_' + str(arg_pident) + '.' + datetime.datetime.now().strftime('%Y%m%d') + '.txt'
     output = open(output_filename, 'w')
 
     for k, v in result:
