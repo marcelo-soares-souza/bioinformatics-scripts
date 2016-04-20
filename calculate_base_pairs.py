@@ -5,6 +5,7 @@ import sys
 import csv
 import datetime
 from collections import defaultdict
+from collections import Counter
 from time import time
 from Bio import SeqIO
 from Bio.Seq import Seq
@@ -65,7 +66,32 @@ else:
 
         size = initial_size - len(x)
 
+        info[k]['size'] = size
+
         log = 'SSEQID: %s SLEN: %s BPs: %s PIDENT >= %s\n' % (str(k), str(info[k]['slen']), str(size), str(arg_pident))
+
+        print(log)
+        output.write(log)
+
+    final_result = defaultdict(dict)
+
+    for k, v in info.items():
+        id = k.rsplit('_', 1)[0]
+        bps = int(v['size'])
+        slen = int(v['slen'])
+
+        if 'bps' in final_result[id]:
+          final_result[id]['bps'] = final_result[id]['bps'] + bps
+        else:
+          final_result[id]['bps'] = bps
+
+        if 'slen' in final_result[id]:
+          final_result[id]['slen'] = final_result[id]['slen'] + slen
+        else:
+          final_result[id]['slen'] = slen
+
+    for k, v in final_result.items():
+        log = '%s %s %s %0.2f\n' % (str(k), str(v['slen']), str(v['bps']), (100 * float(v['bps']) / float(v['slen'])))
         print(log)
         output.write(log)
 
