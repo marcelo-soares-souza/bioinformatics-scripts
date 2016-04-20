@@ -46,9 +46,16 @@ else:
 
             if pident >= arg_pident and qcovs >= arg_qcovs:
                 if id in records.keys():
-                    print('\nRemoving', id, 'with PIDENT', pident, 'and QCOVS', qcovs)
 
-                    SeqIO.write(records[id], output_removed, 'fastq')
+                    print('\nRemoving', id, 'with PIDENT', pident, 'and QCOVS', qcovs)
+                    print(records[id].letter_annotations["phred_quality"])
+         
+                    header = '%s %s %s %s' % (id, subject, str(pident), str(qcovs))
+
+                    record = SeqRecord(Seq(str(records[id].seq), Alphabet()), id=str(header), description='')
+                    record.letter_annotations["phred_quality"] = records[id].letter_annotations["phred_quality"]
+
+                    SeqIO.write(record, output_removed, 'fastq')
 
                     del records[id]
 
