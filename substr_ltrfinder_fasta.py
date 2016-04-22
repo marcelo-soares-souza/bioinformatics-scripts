@@ -11,7 +11,7 @@ from Bio.SeqRecord import SeqRecord
 from Bio.Alphabet import Alphabet
 
 if len(sys.argv) < 3:
-    print('Usage: ', str(sys.argv[0]), '[LTR FINDER FILE] [FASTA FILE]')
+    print('Usage: ', str(sys.argv[0]), '[LTR FINDER FILE] [FASTA FILE] [OUTPUT NAME]')
 else:
     start_time = time()
 
@@ -19,7 +19,7 @@ else:
     fasta_file = str(sys.argv[2])
 
     records = SeqIO.index(fasta_file, 'fasta')
-    output = open(os.path.splitext(sys.argv[2])[0] + '.result.fasta', 'w')
+    output = open(sys.argv[3], 'w')
 
     print('Using', ltrfinder_file, 'LTR Finder and', fasta_file, 'FASTA File')
 
@@ -44,7 +44,7 @@ else:
 
             SeqIO.write(record, output, 'fasta')
 
-    print('\nCheck the results in ', os.path.splitext(sys.argv[2])[0], '.result.fasta\n', sep='')
+    print('\nCheck the results in ', sys.argv[3], '\n', sep='')
 
     output.close()
     records.close()
