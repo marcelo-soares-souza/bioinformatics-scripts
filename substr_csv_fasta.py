@@ -10,8 +10,8 @@ from Bio.Seq import Seq
 from Bio.SeqRecord import SeqRecord
 from Bio.Alphabet import Alphabet
 
-if len(sys.argv) < 3:
-    print('Usage:', str(sys.argv[0]), '[CSV FILE] [FASTA FILE]')
+if len(sys.argv) < 4:
+    print('Usage:', str(sys.argv[0]), '[CSV FILE] [FASTA FILE] [OUTPUT]')
 else:
     start_time = time()
 
@@ -19,7 +19,7 @@ else:
     fasta_file = str(sys.argv[2])
 
     records = SeqIO.index(fasta_file, 'fasta')
-    output = open(os.path.splitext(sys.argv[2])[0] + '.result.' + datetime.datetime.now().strftime('%Y%m%d') + '.fasta', 'w')
+    output = open(sys.argv[3], "w")
 
     print('Using', csv_file, 'CSV Table and', fasta_file, 'FASTA File')
 
@@ -46,7 +46,7 @@ else:
 
             SeqIO.write(record, output, 'fasta')
 
-    print('\nCheck the results in ', os.path.splitext(sys.argv[2])[0], '.result.fasta\n', sep='')
+    print('\nCheck the results in ', sys.argv[3], '\n', sep='')
 
     output.close()
     records.close()
