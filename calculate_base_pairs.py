@@ -34,12 +34,11 @@ else:
             if pident >= arg_pident:
                 id = str(data[2])
                 slen = data[3]
-                start, end  = int(data[6]), int(data[7])
+                start, end = int(data[6]), int(data[7])
 
                 if start > end:
                     start, end = end, start
 
-                # print("id", id, "slen", slen, "start", start, "end", end, "pident", pident)
                 info[id]['slen'] = slen
                 info[id]['pident'] = pident
 
@@ -61,8 +60,8 @@ else:
         initial_size = len(x)
 
         for y in s:
-          y = set(range(y[0], y[1]))
-          x = x - y
+            y = set(range(y[0], y[1]))
+            x = x - y
 
         size = initial_size - len(x)
 
@@ -81,14 +80,14 @@ else:
         slen = int(v['slen'])
 
         if 'bps' in final_result[id]:
-          final_result[id]['bps'] = final_result[id]['bps'] + bps
+            final_result[id]['bps'] = final_result[id]['bps'] + bps
         else:
-          final_result[id]['bps'] = bps
+            final_result[id]['bps'] = bps
 
         if 'slen' in final_result[id]:
-          final_result[id]['slen'] = final_result[id]['slen'] + slen
+            final_result[id]['slen'] = final_result[id]['slen'] + slen
         else:
-          final_result[id]['slen'] = slen
+            final_result[id]['slen'] = slen
 
     for k, v in final_result.items():
         log = '%s %s %s %0.2f\n' % (str(k), str(v['slen']), str(v['bps']), (100 * float(v['bps']) / float(v['slen'])))

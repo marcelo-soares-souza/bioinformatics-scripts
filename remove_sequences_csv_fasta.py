@@ -64,11 +64,11 @@ else:
 
     if write:
         output = open(output_result_filename, 'w')
-        [ SeqIO.write(record, output, 'fastq') for (id, record) in records.items() ]
+        [SeqIO.write(record, output, 'fastq') for (id, record) in records.items()]
         output.close()
 
         print('\nCheck the results in ', output_result_filename, '\n', sep='')
-        print('Removed Sequences (',removed_sequences,') in ', output_removed_filename, '\n', sep='')
+        print('Removed Sequences (', removed_sequences, ') in ', output_removed_filename, '\n', sep='')
     else:
         print('No sequences found\n')
 

@@ -6,7 +6,7 @@ from time import time
 from Bio import Entrez
 from Bio import SeqIO
 
-Entrez.email ="lbb@cnpae.embrapa.br"
+Entrez.email = "lbb@cnpae.embrapa.br"
 
 if len(sys.argv) < 2:
     print('Usage: ', str(sys.argv[0]), '[ID]')
