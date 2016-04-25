@@ -4,6 +4,7 @@
 # (C)2016 Marcelo Soares Souza <marcelo.soares@colaborador.embrapa.br>
 
 import json
+import re
 from csv import reader
 from datetime import datetime
 from sys import argv
@@ -29,9 +30,6 @@ else:
     filename['clean'] = str(splitext(filename['data'])[0] + '.clean.' + date + '.' + filename['data_format'])
     filename['removed'] = str(splitext(filename['data'])[0] + '.removed.' + date + '.' + filename['data_format'])
 
-    if len(argv) > 6:
-        filename['gi'] = str(argv[6])
-	
     params = {}
     params['pident'] = float(argv[4])
     params['qcovs'] = float(argv[5])
@@ -43,15 +41,27 @@ else:
     index['subject'] = config['fields'].index('subject')
     index['pident'] = config['fields'].index('pident')
     index['qcovs'] = config['fields'].index('qcovs')
+    index['organism'] = config['fields'].index('organism')
 
     output = {}
     write = False
+    use_gi = False
     removed_sequences = 0
+
+    if len(argv) > 6:
+        filename['gi'] = str(argv[6])
+        use_gi = True
 
     print('\nReading', filename['data'], 'FAST(A/Q) File')
     records = SeqIO.to_dict(SeqIO.parse(filename['data'], filename['data_format']))
 
     print('\nUsing', filename['t6'], 'T6 Table and', filename['data'], 'FAST(A/Q) File')
+
+    if use_gi:
+        print('\nUsing', filename['gi'], 'GI List');
+
+        with open(filename['gi'], 'r') as gi:
+            gi_list = list(reader(gi))
 
     with open(filename['t6'], 'r') as t6:
 
@@ -64,13 +74,18 @@ else:
             subject = value[index['subject']]
             pident = float(value[index['pident']])
             qcovs = float(value[index['qcovs']])
+            organism = str(value[index['organism']])
 
             if pident >= params['pident'] and qcovs >= params['qcovs']:
                 if id in records.keys():
 
-                    print('\nRemoving', id, 'with PIDENT', pident, 'and QCOVS', qcovs)
+                    if use_gi:
+                        print('\nSearching', subject, 'in GI List')
+                        [print('Found GI Element', '|gi|' + str(''.join(str(s) for s in s)) + '|', organism) for s in gi_list if re.search('gi\|' + str(''.join(str(s) for s in s)) + '\|', subject)]
 
-                    header = '%s %s %s %s' % (id, subject, str(pident), str(qcovs))
+                    print('\nRemoving', id, '(', subject,')', organism, ', with PIDENT', pident, 'and QCOVS', qcovs)
+
+                    header = '%s %s %s %s %s' % (id, subject, str(pident), str(qcovs), str(organism))
                     record = SeqRecord(Seq(str(records[id].seq), Alphabet()), id=str(header), description='')
 
                     if filename['data_format'] == 'fastq':
