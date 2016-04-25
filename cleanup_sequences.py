@@ -3,6 +3,7 @@
 # Cleanup Sequences Based on a .T6 File and a GI List (Optional)
 # (C)2016 Marcelo Soares Souza <marcelo.soares@colaborador.embrapa.br>
 
+import json
 from csv import reader
 from datetime import datetime
 from sys import argv
@@ -13,8 +14,8 @@ from Bio.Seq import Seq
 from Bio.SeqRecord import SeqRecord
 from Bio.Alphabet import Alphabet
 
-if len(argv) < 5:
-    print('Usage:', str(argv[0]), '[T6 FILE] [FAST(A/Q) FILE] [PIDENT] [QCOVS] [GI LIST FILE]')
+if len(argv) < 6:
+    print('Usage:', str(argv[0]), '[T6 FILE] [INFO FILE] [FAST(A/Q) FILE] [PIDENT] [QCOVS] <GI LIST FILE>')
 else:
     start_time = time()
 
@@ -22,17 +23,26 @@ else:
 
     filename = {}
     filename['t6'] = str(argv[1])
-    filename['data'] = str(argv[2])
+    filename['info'] = str(argv[2])
+    filename['data'] = str(argv[3])
     filename['data_format'] = str(splitext(filename['data'])[1][1:])
     filename['clean'] = str(splitext(filename['data'])[0] + '.clean.' + date + '.' + filename['data_format'])
     filename['removed'] = str(splitext(filename['data'])[0] + '.removed.' + date + '.' + filename['data_format'])
 
     if len(argv) > 6:
-        filename['gi'] = str(argv[5])
+        filename['gi'] = str(argv[6])
 	
     params = {}
-    params['pident'] = float(argv[3])
-    params['qcovs'] = float(argv[4])
+    params['pident'] = float(argv[4])
+    params['qcovs'] = float(argv[5])
+
+    config = json.loads(open(filename['info']).read())
+
+    index = {}
+    index['id'] = config['fields'].index('id')
+    index['subject'] = config['fields'].index('subject')
+    index['pident'] = config['fields'].index('pident')
+    index['qcovs'] = config['fields'].index('qcovs')
 
     output = {}
     write = False
@@ -44,15 +54,16 @@ else:
     print('\nUsing', filename['t6'], 'T6 Table and', filename['data'], 'FAST(A/Q) File')
 
     with open(filename['t6'], 'r') as t6:
-        data = reader(t6, delimiter='\t')
 
         output['removed'] = open(filename['removed'], 'w')
 
+        data = reader(t6, delimiter='\t')
+
         for value in data:
-            id = value[0]
-            subject = value[2]
-            pident = float(value[11])
-            qcovs = float(value[14])
+            id = value[index['id']]
+            subject = value[index['subject']]
+            pident = float(value[index['pident']])
+            qcovs = float(value[index['qcovs']])
 
             if pident >= params['pident'] and qcovs >= params['qcovs']:
                 if id in records.keys():
