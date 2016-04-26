@@ -60,8 +60,18 @@ else:
     if use_gi:
         print('\nUsing', filename['gi'], 'GI List');
 
+        removed_sequences_using_gi = 0
+
+        filename['gi_output'] = str(splitext(filename['data'])[0] + '.gilist.' + date + '.' + filename['data_format'])
+        output['gi_output'] = open(filename['gi_output'], 'w')
+
         with open(filename['gi'], 'r') as gi:
+            gi_to_clean = {}
             gi_list = list(reader(gi))
+
+            for gi in gi_list:
+                gi_subject = 'gi|%s|' % (''.join(gi))
+                gi_to_clean[gi_subject] = ''
 
     with open(filename['t6'], 'r') as t6:
 
@@ -76,12 +86,27 @@ else:
             qcovs = float(value[index['qcovs']])
             organism = str(value[index['organism']])
 
+            s = subject.rsplit('|',3)[0] + '|'
+
+            if use_gi:
+                if s in gi_to_clean.keys():
+                    if id in records.keys():
+                        print('\nFound GI Element', s, 'id', id)
+
+                        header = '%s %s %s %s %s' % (id, subject, str(pident), str(qcovs), str(organism))
+                        record = SeqRecord(Seq(str(records[id].seq), Alphabet()), id=str(header), description='')
+
+                        if filename['data_format'] == 'fastq':
+                            record.letter_annotations["phred_quality"] = records[id].letter_annotations["phred_quality"]
+
+                        SeqIO.write(record, output['gi_output'], filename['data_format'])
+
+                        del records[id]
+
+                        removed_sequences_using_gi = removed_sequences_using_gi + 1
+
             if pident >= params['pident'] and qcovs >= params['qcovs']:
                 if id in records.keys():
-
-                    if use_gi:
-                        print('\nSearching', subject, 'in GI List')
-                        [print('Found GI Element', '|gi|' + str(''.join(str(s) for s in s)) + '|', organism) for s in gi_list if re.search('gi\|' + str(''.join(str(s) for s in s)) + '\|', subject)]
 
                     print('\nRemoving', id, '(', subject,')', organism, ', with PIDENT', pident, 'and QCOVS', qcovs)
 
@@ -95,10 +120,14 @@ else:
 
                     del records[id]
 
-                    write = True
                     removed_sequences = removed_sequences + 1
 
+                    write = True
+
     output['removed'].close()
+
+    if use_gi:
+        output['gi_output'].close()
 
     print('\nWriting Results...')
 
@@ -109,6 +138,10 @@ else:
 
         print('\nCheck the results in ', filename['clean'], '\n', sep='')
         print('Removed Sequences (', removed_sequences, ') in ', filename['removed'], '\n', sep='')
+
+        if use_gi:
+            print('Removed using GI List (', removed_sequences_using_gi, ') in ', filename['gi_output'], '\n', sep='')
+
     else:
         print('No sequences found\n')
 
