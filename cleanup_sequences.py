@@ -37,11 +37,11 @@ else:
     params['qcovs'] = int(config['qcovs'])
 
     index = {}
-    index['id'] = config['fields'].split().index('id')
-    index['subject'] = config['fields'].split().index('subject')
+    index['qseqid'] = config['fields'].split().index('qseqid')
+    index['sseqid'] = config['fields'].split().index('sseqid')
     index['pident'] = config['fields'].split().index('pident')
     index['qcovs'] = config['fields'].split().index('qcovs')
-    index['organism'] = config['fields'].split().index('organism')
+    index['sscinames'] = config['fields'].split().index('sscinames')
 
     output = {}
     write = False
@@ -70,8 +70,8 @@ else:
             gi_list = list(reader(gi))
 
             for gi in gi_list:
-                gi_subject = 'gi|%s|' % (''.join(gi))
-                gi_to_clean[gi_subject] = ''
+                gi_sseqid = 'gi|%s|' % (''.join(gi))
+                gi_to_clean[gi_sseqid] = ''
 
     with open(filename['t6'], 'r') as t6:
 
@@ -80,45 +80,45 @@ else:
         data = reader(t6, delimiter='\t')
 
         for value in data:
-            id = value[index['id']]
-            subject = value[index['subject']]
+            qseqid = value[index['qseqid']]
+            sseqid = value[index['sseqid']]
             pident = float(value[index['pident']])
             qcovs = int(value[index['qcovs']])
-            organism = str(value[index['organism']])
+            sscinames = str(value[index['sscinames']])
 
-            s = subject.rsplit('|',3)[0] + '|'
+            s = sseqid.rsplit('|',3)[0] + '|'
 
             if use_gi:
                 if s in gi_to_clean.keys():
-                    if id in records.keys():
-                        print('\nFound GI Element', s, 'id', id)
+                    if qseqid in records.keys():
+                        print('\nFound GI Element', s, 'qseqid', qseqid)
 
-                        header = '%s %s %s %s %s' % (id, subject, str(pident), str(qcovs), str(organism))
-                        record = SeqRecord(Seq(str(records[id].seq), Alphabet()), id=str(header), description='')
+                        header = '%s %s %s %s %s' % (qseqid, sseqid, str(pident), str(qcovs), str(sscinames))
+                        record = SeqRecord(Seq(str(records[qseqid].seq), Alphabet()), id=str(header), description='')
 
                         if filename['data_format'] == 'fastq':
-                            record.letter_annotations["phred_quality"] = records[id].letter_annotations["phred_quality"]
+                            record.letter_annotations["phred_quality"] = records[qseqid].letter_annotations["phred_quality"]
 
                         SeqIO.write(record, output['gi_output'], filename['data_format'])
 
-                        del records[id]
+                        del records[qseqid]
 
                         removed_sequences_using_gi = removed_sequences_using_gi + 1
 
             if pident >= params['pident'] and qcovs >= params['qcovs']:
-                if id in records.keys():
+                if qseqid in records.keys():
 
-                    print('\nRemoving', id, '(', subject,')', organism, ', with PIDENT', pident, 'and QCOVS', qcovs)
+                    print('\nRemoving', qseqid, '(', sseqid,')', sscinames, ', with PIDENT', pident, 'and QCOVS', qcovs)
 
-                    header = '%s %s %s %s %s' % (id, subject, str(pident), str(qcovs), str(organism))
-                    record = SeqRecord(Seq(str(records[id].seq), Alphabet()), id=str(header), description='')
+                    header = '%s %s %s %s %s' % (qseqid, sseqid, str(pident), str(qcovs), str(sscinames))
+                    record = SeqRecord(Seq(str(records[qseqid].seq), Alphabet()), id=str(header), description='')
 
                     if filename['data_format'] == 'fastq':
-                        record.letter_annotations["phred_quality"] = records[id].letter_annotations["phred_quality"]
+                        record.letter_annotations["phred_quality"] = records[qseqid].letter_annotations["phred_quality"]
 
                     SeqIO.write(record, output['removed'], filename['data_format'])
 
-                    del records[id]
+                    del records[qseqid]
 
                     removed_sequences = removed_sequences + 1
 
@@ -133,7 +133,7 @@ else:
 
     if write:
         output['clean'] = open(filename['clean'], 'w')
-        [SeqIO.write(record, output['clean'], filename['data_format']) for (id, record) in records.items()]
+        [SeqIO.write(record, output['clean'], filename['data_format']) for (qseqid, record) in records.items()]
         output['clean'].close()
 
         print('\nCheck the results in ', filename['clean'], '\n', sep='')
