@@ -3,8 +3,7 @@
 # Cleanup Sequences Based on a .T6 File and a GI List (Optional)
 # (C)2016 Marcelo Soares Souza <marcelo.soares@colaborador.embrapa.br>
 
-import json
-import re
+from json import loads
 from csv import reader
 from datetime import datetime
 from sys import argv
@@ -15,41 +14,42 @@ from Bio.Seq import Seq
 from Bio.SeqRecord import SeqRecord
 from Bio.Alphabet import Alphabet
 
-if len(argv) < 6:
-    print('Usage:', str(argv[0]), '[T6 FILE] [INFO FILE] [FAST(A/Q) FILE] [PIDENT] [QCOVS] <GI LIST FILE>')
+if len(argv) < 2:
+    print('Usage:', str(argv[0]), '[INFO FILE]')
 else:
     start_time = time()
 
     date = datetime.now().strftime('%Y%m%d')
 
     filename = {}
-    filename['t6'] = str(argv[1])
-    filename['info'] = str(argv[2])
-    filename['data'] = str(argv[3])
+    filename['info'] = str(argv[1])
+    config = loads(open(filename['info']).read())
+
+    filename['t6'] = str(config['t6'])
+    filename['data'] = str(config['input'])
     filename['data_format'] = str(splitext(filename['data'])[1][1:])
     filename['clean'] = str(splitext(filename['data'])[0] + '.clean.' + date + '.' + filename['data_format'])
     filename['removed'] = str(splitext(filename['data'])[0] + '.removed.' + date + '.' + filename['data_format'])
 
-    params = {}
-    params['pident'] = float(argv[4])
-    params['qcovs'] = float(argv[5])
 
-    config = json.loads(open(filename['info']).read())
+    params = {}
+    params['pident'] = float(config['pident'])
+    params['qcovs'] = int(config['qcovs'])
 
     index = {}
-    index['id'] = config['fields'].index('id')
-    index['subject'] = config['fields'].index('subject')
-    index['pident'] = config['fields'].index('pident')
-    index['qcovs'] = config['fields'].index('qcovs')
-    index['organism'] = config['fields'].index('organism')
+    index['id'] = config['fields'].split().index('id')
+    index['subject'] = config['fields'].split().index('subject')
+    index['pident'] = config['fields'].split().index('pident')
+    index['qcovs'] = config['fields'].split().index('qcovs')
+    index['organism'] = config['fields'].split().index('organism')
 
     output = {}
     write = False
     use_gi = False
     removed_sequences = 0
 
-    if len(argv) > 6:
-        filename['gi'] = str(argv[6])
+    if 'gi' in config:
+        filename['gi'] = str(config['gi'])
         use_gi = True
 
     print('\nReading', filename['data'], 'FAST(A/Q) File')
@@ -83,7 +83,7 @@ else:
             id = value[index['id']]
             subject = value[index['subject']]
             pident = float(value[index['pident']])
-            qcovs = float(value[index['qcovs']])
+            qcovs = int(value[index['qcovs']])
             organism = str(value[index['organism']])
 
             s = subject.rsplit('|',3)[0] + '|'
