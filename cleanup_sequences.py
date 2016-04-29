@@ -113,6 +113,9 @@ else:
 
                         removed_sequences_using_gi = removed_sequences_using_gi + 1
 
+                        write = True
+
+
             if pident >= params['pident'] and qcovs >= params['qcovs']:
                 if qseqid in records.keys():
 
