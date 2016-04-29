@@ -38,7 +38,7 @@ else:
                 print('Reverse Complement...')
                 seq = records[id].seq[int(end):int(begin)].reverse_complement()
 
-            header = '%s|size%s[%s_to_%s](%s nts)' % (id, len(records[id]), begin, end, len(seq))
+            header = '%s|size%s[%s_to_%s](%snts)' % (id, len(records[id]), begin, end, len(seq))
 
             record = SeqRecord(Seq(str(seq), Alphabet()), id=str(header), description='')
 
