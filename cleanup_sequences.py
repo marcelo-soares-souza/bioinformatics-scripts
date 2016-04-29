@@ -3,7 +3,7 @@
 # Cleanup Sequences Based on a .T6 File and a GI List (Optional)
 # (C)2016 Marcelo Soares Souza <marcelo.soares@colaborador.embrapa.br>
 
-# from json import loads
+from json import loads
 from yaml import load, dump
 from csv import reader
 from datetime import datetime
@@ -24,8 +24,15 @@ else:
 
     filename = {}
     filename['info'] = str(argv[1])
-    config = load(open(filename['info']).read())
-    print(config)
+
+    try:
+        config = loads(open(filename['info']).read())
+    except:
+        print('\nTrying YAML Based File')
+        config = load(open(filename['info']).read())
+    else:
+        print('\nLoad JSON Based File')
+
     filename['t6'] = str(config['t6'])
     filename['data'] = str(config['input'])
     filename['data_format'] = str(splitext(filename['data'])[1][1:])
