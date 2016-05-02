@@ -92,8 +92,15 @@ else:
 
         removed_sequences_using_gi = 0
 
+        gi_output_extension = ''
+
+        if params['gi-type'] == 'negative':
+            gi_output_extension = '.at-gilist-'
+        else:
+            gi_output_extension = '.not-gilist-'
+
         filename['gi_output'] = str(splitext(filename['data'])[0] +
-                                    '.at-gilist-' +
+                                    gi_output_extension +
                                     str(config['gi-taxon']).lower() +
                                     '.' + filename['data_format'])
 
@@ -125,7 +132,7 @@ else:
             s = sseqid.rsplit('|',3)[0] + '|'
 
             if use_gi:
-                if s in gi_to_clean.keys():
+                if s in gi_to_clean.keys() and params['gi-type'] == 'negative':
                     if qseqid in records.keys():
                         print('\nFound GI Element', s, 'qseqid', qseqid, sscinames)
 
