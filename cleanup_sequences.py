@@ -10,6 +10,7 @@ from datetime import datetime
 from sys import argv
 from os.path import splitext
 from time import time
+from collections import defaultdict
 from Bio import SeqIO
 from Bio.Seq import Seq
 from Bio.SeqRecord import SeqRecord
@@ -79,6 +80,8 @@ else:
                               removed_extension + 
                               '.' + filename['data_format'])
 
+    filename['removed-stats'] = str(splitext(filename['removed'])[0]) + '.stats'
+
     print('\nReading', filename['data'], 'FAST(A/Q) File')
     records = SeqIO.to_dict(SeqIO.parse(filename['data'], filename['data_format']))
 
@@ -104,6 +107,8 @@ else:
                 gi_sseqid = 'gi|%s|' % (''.join(gi))
                 gi_to_clean[gi_sseqid] = ''
 
+    stats = defaultdict(int)
+
     with open(filename['t6'], 'r') as t6:
 
         output['removed'] = open(filename['removed'], 'w')
@@ -122,7 +127,7 @@ else:
             if use_gi:
                 if s in gi_to_clean.keys():
                     if qseqid in records.keys():
-                        print('\nFound GI Element', s, 'qseqid', qseqid)
+                        print('\nFound GI Element', s, 'qseqid', qseqid, sscinames)
 
                         header = '%s %s %s %s %s' % (qseqid, sseqid, str(pident), str(qcovs), str(sscinames))
                         record = SeqRecord(Seq(str(records[qseqid].seq), Alphabet()), id=str(header), description='')
@@ -158,6 +163,8 @@ else:
 
                     write = True
 
+                    stats[sscinames] = stats[sscinames] + 1
+
     output['removed'].close()
 
     if use_gi:
@@ -172,6 +179,7 @@ else:
 
         print('\nCheck the results in ', filename['clean'], '\n', sep='')
         print('Removed Sequences (', removed_sequences, ') in ', filename['removed'], '\n', sep='')
+        print('Stats for Removed Sequences in ', filename['removed-stats'], '\n', sep='')
 
         if use_gi:
             print('Removed using GI List (', removed_sequences_using_gi, ') in ', filename['gi_output'], '\n', sep='')
@@ -182,3 +190,8 @@ else:
     end_time = time()
 
     print('Took %.3f seconds...\n' % (end_time - start_time))
+
+    total_stats = sum(stats.values())
+    output['removed-stats'] = open(filename['removed-stats'], 'w')
+    [output['removed-stats'].write("%s: %s of %s (%.2f%%) \n" % (k, v, total_stats, float(v * 100 / total_stats))) for k, v in sorted(stats.items(), key=lambda x: x[1], reverse=True)]
+    output['removed-stats'].close()
