@@ -33,16 +33,19 @@ else:
     else:
         print('\nLoad JSON Based File')
 
-    filename['t6'] = str(config['t6'])
-    filename['data'] = str(config['input'])
-    filename['data_format'] = str(splitext(filename['data'])[1][1:])
-    filename['clean'] = str(splitext(filename['data'])[0] + '.clean.' + date + '.' + filename['data_format'])
-    filename['removed'] = str(splitext(filename['data'])[0] + '.removed.' + date + '.' + filename['data_format'])
-
-
     params = {}
     params['pident'] = float(config['pident'])
     params['qcovs'] = int(config['qcovs'])
+
+    filename['t6'] = str(config['t6'])
+    filename['data'] = str(config['input'])
+    filename['data_format'] = str(splitext(filename['data'])[1][1:])
+    filename['clean'] = str(splitext(filename['data'])[0] +
+                            '.nohits-' +
+                            str(config['blast-type']).lower() +
+                            '-' +
+                            str(config['blast-db']).lower() +
+                            '.' + filename['data_format'])
 
     index = {}
     index['qseqid'] = config['fields'].split().index('qseqid')
@@ -55,10 +58,26 @@ else:
     write = False
     use_gi = False
     removed_sequences = 0
+    removed_extension = ''
 
     if 'gi' in config:
         filename['gi'] = str(config['gi'])
+        params['gi-type'] = str(config['gi-type']).lower()
+
+        if params['gi-type'] == 'negative':
+          removed_extension = '_neg-list-%s' % str(config['gi-taxon']).lower()
+        else:
+          removed_extension = '_pos-list-%s' % str(config['gi-taxon']).lower()
+
         use_gi = True
+
+    filename['removed'] = str(splitext(filename['data'])[0] +
+                              '.filter_pident-' +
+                              str(params['pident'])  +
+                              '_qcovs-' +
+                              str(params['qcovs']) +
+                              removed_extension + 
+                              '.' + filename['data_format'])
 
     print('\nReading', filename['data'], 'FAST(A/Q) File')
     records = SeqIO.to_dict(SeqIO.parse(filename['data'], filename['data_format']))
@@ -66,11 +85,15 @@ else:
     print('\nUsing', filename['t6'], 'T6 Table and', filename['data'], 'FAST(A/Q) File')
 
     if use_gi:
-        print('\nUsing', filename['gi'], 'GI List');
+        print('\nUsing', filename['gi'], 'GI List as', params['gi-type'].title());
 
         removed_sequences_using_gi = 0
 
-        filename['gi_output'] = str(splitext(filename['data'])[0] + '.gilist.' + date + '.' + filename['data_format'])
+        filename['gi_output'] = str(splitext(filename['data'])[0] +
+                                    '.at-gilist-' +
+                                    str(config['gi-taxon']).lower() +
+                                    '.' + filename['data_format'])
+
         output['gi_output'] = open(filename['gi_output'], 'w')
 
         with open(filename['gi'], 'r') as gi:
