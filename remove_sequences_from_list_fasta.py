@@ -27,7 +27,7 @@ else:
     write = False
     removed_sequences = 0
 
-    if len(sys.argv) > 4:
+    if len(sys.argv) >= 4:
         if str(sys.argv[3]) == "--all":
             all = True
 
@@ -55,7 +55,7 @@ else:
 
     output_removed.close()
 
-    print('Writing Results...')
+    print('\nWriting Results...')
 
     if write:
         if all:
