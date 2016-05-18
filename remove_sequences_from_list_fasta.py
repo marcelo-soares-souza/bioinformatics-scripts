@@ -11,7 +11,7 @@ from Bio.SeqRecord import SeqRecord
 from Bio.Alphabet import Alphabet
 
 if len(sys.argv) < 3:
-    print('Usage:', str(sys.argv[0]), '[CSV FILE] [FASTA FILE]')
+    print('Usage:', str(sys.argv[0]), '[CSV FILE] [FASTA FILE] [--all]')
 else:
     start_time = time()
 
@@ -23,8 +23,13 @@ else:
 
     output_removed = open(output_removed_filename, 'w')
 
+    all = False
     write = False
     removed_sequences = 0
+
+    if len(sys.argv) > 4:
+        if str(sys.argv[3]) == "--all":
+            all = True
 
     print('\nReading', fasta_filename, 'FASTA File')
     records = SeqIO.to_dict(SeqIO.parse(fasta_filename, 'fasta'))
@@ -53,11 +58,13 @@ else:
     print('Writing Results...')
 
     if write:
-        output = open(output_result_filename, 'w')
-        [SeqIO.write(record, output, 'fasta') for (id, record) in records.items()]
-        output.close()
+        if all:
+            output = open(output_result_filename, 'w')
+            [SeqIO.write(record, output, 'fasta') for (id, record) in records.items()]
+            output.close()
 
-        print('\nCheck the results in ', output_result_filename, '\n', sep='')
+            print('\nCheck the results in ', output_result_filename, '\n', sep='')
+
         print('Removed Sequences (', removed_sequences, ') in ', output_removed_filename, '\n', sep='')
     else:
         print('No sequences found\n')
