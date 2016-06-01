@@ -1,13 +1,13 @@
-#! /usr/bin/python3
+#!/usr/bin/python3
 
-# Cleanup Sequences Based on a .T6 File and a GI List (Optional)
-# (C)2016 Marcelo Soares Souza <marcelo.soares@colaborador.embrapa.br>
+# (C) 2016 Marcelo Soares Souza <marcelo.soares@colaborador.embrapa.br>
+# This program is licensed under a LGPLv3 License.
 
 from json import loads
-from yaml import load, dump
+from yaml import load
 from csv import reader
-from datetime import datetime
 from sys import argv
+from datetime import datetime
 from os.path import splitext
 from time import time
 from collections import defaultdict
@@ -66,29 +66,35 @@ else:
         params['gi-type'] = str(config['gi-type']).lower()
 
         if params['gi-type'] == 'negative':
-          removed_extension = '_neg-list-%s' % str(config['gi-taxon']).lower()
+            removed_extension = '_neg-list-%s' % str(
+                config['gi-taxon']).lower()
         else:
-          removed_extension = '_pos-list-%s' % str(config['gi-taxon']).lower()
+            removed_extension = '_pos-list-%s' % str(
+                config['gi-taxon']).lower()
 
         use_gi = True
 
     filename['removed'] = str(splitext(filename['data'])[0] +
                               '.filter_pident-' +
-                              str(params['pident'])  +
+                              str(params['pident']) +
                               '_qcovs-' +
                               str(params['qcovs']) +
-                              removed_extension + 
+                              removed_extension +
                               '.' + filename['data_format'])
 
-    filename['removed-stats'] = str(splitext(filename['removed'])[0]) + '.stats'
+    filename[
+        'removed-stats'] = str(splitext(filename['removed'])[0]) + '.stats'
 
     print('\nReading', filename['data'], 'FAST(A/Q) File')
-    records = SeqIO.to_dict(SeqIO.parse(filename['data'], filename['data_format']))
+    records = SeqIO.to_dict(SeqIO.parse(
+        filename['data'], filename['data_format']))
 
-    print('\nUsing', filename['t6'], 'T6 Table and', filename['data'], 'FAST(A/Q) File')
+    print('\nUsing', filename['t6'], 'T6 Table and',
+          filename['data'], 'FAST(A/Q) File')
 
     if use_gi:
-        print('\nUsing', filename['gi'], 'GI List as', params['gi-type'].title());
+        print('\nUsing', filename['gi'],
+              'GI List as', params['gi-type'].title())
 
         removed_sequences_using_gi = 0
 
@@ -129,20 +135,25 @@ else:
             qcovs = int(value[index['qcovs']])
             sscinames = str(value[index['sscinames']])
 
-            s = sseqid.rsplit('|',3)[0] + '|'
+            s = sseqid.rsplit('|', 3)[0] + '|'
 
             if use_gi:
                 if s in gi_to_clean.keys() and params['gi-type'] == 'negative':
                     if qseqid in records.keys():
-                        print('\nFound GI Element', s, 'qseqid', qseqid, sscinames)
+                        print('\nFound GI Element', s,
+                              'qseqid', qseqid, sscinames)
 
-                        header = '%s %s %s %s %s' % (qseqid, sseqid, str(pident), str(qcovs), str(sscinames))
-                        record = SeqRecord(Seq(str(records[qseqid].seq), Alphabet()), id=str(header), description='')
+                        header = '%s %s %s %s %s' % (qseqid, sseqid, str(
+                            pident), str(qcovs), str(sscinames))
+                        record = SeqRecord(
+                            Seq(str(records[qseqid].seq), Alphabet()), id=str(header), description='')
 
                         if filename['data_format'] == 'fastq':
-                            record.letter_annotations["phred_quality"] = records[qseqid].letter_annotations["phred_quality"]
+                            record.letter_annotations["phred_quality"] = records[
+                                qseqid].letter_annotations["phred_quality"]
 
-                        SeqIO.write(record, output['gi_output'], filename['data_format'])
+                        SeqIO.write(record, output[
+                                    'gi_output'], filename['data_format'])
 
                         del records[qseqid]
 
@@ -150,19 +161,23 @@ else:
 
                         write = True
 
-
             if pident >= params['pident'] and qcovs >= params['qcovs']:
                 if qseqid in records.keys():
 
-                    print('\nRemoving', qseqid, '(', sseqid,')', sscinames, ', with PIDENT', pident, 'and QCOVS', qcovs)
+                    print('\nRemoving', qseqid, '(', sseqid, ')', sscinames,
+                          ', with PIDENT', pident, 'and QCOVS', qcovs)
 
-                    header = '%s %s %s %s %s' % (qseqid, sseqid, str(pident), str(qcovs), str(sscinames))
-                    record = SeqRecord(Seq(str(records[qseqid].seq), Alphabet()), id=str(header), description='')
+                    header = '%s %s %s %s %s' % (qseqid, sseqid, str(
+                        pident), str(qcovs), str(sscinames))
+                    record = SeqRecord(
+                        Seq(str(records[qseqid].seq), Alphabet()), id=str(header), description='')
 
                     if filename['data_format'] == 'fastq':
-                        record.letter_annotations["phred_quality"] = records[qseqid].letter_annotations["phred_quality"]
+                        record.letter_annotations["phred_quality"] = records[
+                            qseqid].letter_annotations["phred_quality"]
 
-                    SeqIO.write(record, output['removed'], filename['data_format'])
+                    SeqIO.write(record, output[
+                                'removed'], filename['data_format'])
 
                     del records[qseqid]
 
@@ -181,15 +196,19 @@ else:
 
     if write:
         output['clean'] = open(filename['clean'], 'w')
-        [SeqIO.write(record, output['clean'], filename['data_format']) for (qseqid, record) in records.items()]
+        [SeqIO.write(record, output['clean'], filename['data_format'])
+         for (qseqid, record) in records.items()]
         output['clean'].close()
 
         print('\nCheck the results in ', filename['clean'], '\n', sep='')
-        print('Removed Sequences (', removed_sequences, ') in ', filename['removed'], '\n', sep='')
-        print('Stats for Removed Sequences in ', filename['removed-stats'], '\n', sep='')
+        print('Removed Sequences (', removed_sequences, ') in ',
+              filename['removed'], '\n', sep='')
+        print('Stats for Removed Sequences in ',
+              filename['removed-stats'], '\n', sep='')
 
         if use_gi:
-            print('Removed using GI List (', removed_sequences_using_gi, ') in ', filename['gi_output'], '\n', sep='')
+            print('Removed using GI List (', removed_sequences_using_gi,
+                  ') in ', filename['gi_output'], '\n', sep='')
 
     else:
         print('No sequences found\n')
@@ -200,5 +219,6 @@ else:
 
     total_stats = sum(stats.values())
     output['removed-stats'] = open(filename['removed-stats'], 'w')
-    [output['removed-stats'].write("%s: %s of %s (%.2f%%) \n" % (k, v, total_stats, float(v * 100 / total_stats))) for k, v in sorted(stats.items(), key=lambda x: x[1], reverse=True)]
+    [output['removed-stats'].write("%s: %s of %s (%.2f%%) \n" % (k, v, total_stats, float(
+        v * 100 / total_stats))) for k, v in sorted(stats.items(), key=lambda x: x[1], reverse=True)]
     output['removed-stats'].close()

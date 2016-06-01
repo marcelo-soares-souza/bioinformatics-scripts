@@ -1,5 +1,8 @@
 #!/usr/bin/python3
 
+# (C) 2016 Marcelo Soares Souza <marcelo.soares@colaborador.embrapa.br>
+# This program is licensed under a LGPLv3 License.
+
 import os
 import sys
 import csv
@@ -18,8 +21,10 @@ else:
     csv_filename = str(sys.argv[1])
     fasta_filename = str(sys.argv[2])
 
-    output_result_filename = os.path.splitext(sys.argv[2])[0] + '.clean.' + datetime.datetime.now().strftime('%Y%m%d') + '.fasta'
-    output_removed_filename = os.path.splitext(sys.argv[2])[0] + '.removed.' + datetime.datetime.now().strftime('%Y%m%d') + '.fasta'
+    output_result_filename = os.path.splitext(sys.argv[2])[
+        0] + '.clean.' + datetime.datetime.now().strftime('%Y%m%d') + '.fasta'
+    output_removed_filename = os.path.splitext(sys.argv[2])[
+        0] + '.removed.' + datetime.datetime.now().strftime('%Y%m%d') + '.fasta'
 
     output_removed = open(output_removed_filename, 'w')
 
@@ -46,7 +51,8 @@ else:
                 print('\nRemoving', id)
 
                 header = '%s' % (id)
-                record = SeqRecord(Seq(str(records[id].seq), Alphabet()), id=str(header), description='')
+                record = SeqRecord(
+                    Seq(str(records[id].seq), Alphabet()), id=str(header), description='')
                 SeqIO.write(record, output_removed, 'fasta')
                 del records[id]
 
@@ -60,12 +66,15 @@ else:
     if write:
         if all:
             output = open(output_result_filename, 'w')
-            [SeqIO.write(record, output, 'fasta') for (id, record) in records.items()]
+            [SeqIO.write(record, output, 'fasta')
+             for (id, record) in records.items()]
             output.close()
 
-            print('\nCheck the results in ', output_result_filename, '\n', sep='')
+            print('\nCheck the results in ',
+                  output_result_filename, '\n', sep='')
 
-        print('Removed Sequences (', removed_sequences, ') in ', output_removed_filename, '\n', sep='')
+        print('Removed Sequences (', removed_sequences, ') in ',
+              output_removed_filename, '\n', sep='')
     else:
         print('No sequences found\n')
 

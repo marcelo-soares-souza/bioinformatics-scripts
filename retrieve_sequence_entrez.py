@@ -1,6 +1,8 @@
 #!/usr/bin/python3
 
-import os
+# (C) 2016 Marcelo Soares Souza <marcelo.soares@colaborador.embrapa.br>
+# This program is licensed under a LGPLv3 License.
+
 import sys
 from time import time
 from Bio import Entrez
@@ -15,7 +17,8 @@ else:
 
     id = str(sys.argv[1])
 
-    handle = Entrez.efetch(db="nucleotide", id=id, rettype="fasta", retmode="text")
+    handle = Entrez.efetch(db="nucleotide", id=id,
+                           rettype="fasta", retmode="text")
 
     seq_record = SeqIO.read(handle, "fasta")
 

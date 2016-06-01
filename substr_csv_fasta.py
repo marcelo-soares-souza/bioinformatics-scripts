@@ -1,9 +1,10 @@
 #!/usr/bin/python3
 
-import os
+# (C) 2016 Marcelo Soares Souza <marcelo.soares@colaborador.embrapa.br>
+# This program is licensed under a LGPLv3 License.
+
 import sys
 import csv
-import datetime
 from time import time
 from Bio import SeqIO
 from Bio.Seq import Seq
@@ -27,7 +28,8 @@ else:
         reader = csv.reader(csv_file)
 
         for id, begin, end in reader:
-            print('\nProcessing', id, 'of size', len(records[id]), 'starting in', begin, 'ending', end)
+            print('\nProcessing', id, 'of size', len(
+                records[id]), 'starting in', begin, 'ending', end)
 
             if int(begin) < int(end):
                 print('Normal Slicing...')
@@ -38,11 +40,13 @@ else:
                 seq = records[id].seq[int(end):int(begin)].reverse_complement()
                 id_name = id + '_RC'
 
-            header = '%s|size%s[%s_to_%s](%s nts)' % (id_name, len(records[id]), begin, end, len(seq))
+            header = '%s|size%s[%s_to_%s](%s nts)' % (
+                id_name, len(records[id]), begin, end, len(seq))
 
             print(header)
 
-            record = SeqRecord(Seq(str(seq), Alphabet()), id=str(header), description='')
+            record = SeqRecord(Seq(str(seq), Alphabet()),
+                               id=str(header), description='')
 
             SeqIO.write(record, output, 'fasta')
 

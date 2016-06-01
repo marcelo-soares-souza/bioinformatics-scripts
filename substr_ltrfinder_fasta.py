@@ -1,8 +1,9 @@
 #!/usr/bin/python3
 
-import os
+# (C) 2016 Marcelo Soares Souza <marcelo.soares@colaborador.embrapa.br>
+# This program is licensed under a LGPLv3 License.
+
 import sys
-import csv
 import itertools
 from time import time
 from Bio import SeqIO
@@ -11,7 +12,8 @@ from Bio.SeqRecord import SeqRecord
 from Bio.Alphabet import Alphabet
 
 if len(sys.argv) < 3:
-    print('Usage: ', str(sys.argv[0]), '[LTR FINDER FILE] [FASTA FILE] [OUTPUT NAME]')
+    print('Usage: ', str(sys.argv[0]),
+          '[LTR FINDER FILE] [FASTA FILE] [OUTPUT NAME]')
 else:
     start_time = time()
 
@@ -24,12 +26,13 @@ else:
     print('Using', ltrfinder_file, 'LTR Finder and', fasta_file, 'FASTA File')
 
     with open(ltrfinder_file, 'r') as file:
-        for line1, line2, line3 in itertools.zip_longest(*[file]*3):
+        for line1, line2, line3 in itertools.zip_longest(*[file] * 3):
             id = line1.split()[1]
             begin = line2.split()[2]
             end = line2.split()[4]
 
-            print('\nProcessing', id, 'of size', len(records[id]), 'starting in', begin, 'ending', end)
+            print('\nProcessing', id, 'of size', len(
+                records[id]), 'starting in', begin, 'ending', end)
 
             if int(begin) < int(end):
                 print('Normal Slicing...')
@@ -38,9 +41,11 @@ else:
                 print('Reverse Complement...')
                 seq = records[id].seq[int(end):int(begin)].reverse_complement()
 
-            header = '%s|size%s[%s_to_%s](%snts)' % (id, len(records[id]), begin, end, len(seq))
+            header = '%s|size%s[%s_to_%s](%snts)' % (
+                id, len(records[id]), begin, end, len(seq))
 
-            record = SeqRecord(Seq(str(seq), Alphabet()), id=str(header), description='')
+            record = SeqRecord(Seq(str(seq), Alphabet()),
+                               id=str(header), description='')
 
             SeqIO.write(record, output, 'fasta')
 

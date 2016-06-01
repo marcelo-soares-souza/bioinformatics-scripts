@@ -1,8 +1,10 @@
 #!/usr/bin/python3
 
+# (C) 2016 Marcelo Soares Souza <marcelo.soares@colaborador.embrapa.br>
+# This program is licensed under a LGPLv3 License.
+
 import os
 import sys
-import csv
 import pandas
 from concurrent.futures import ProcessPoolExecutor
 from time import time
@@ -13,9 +15,11 @@ from Bio.Alphabet import Alphabet
 
 
 def slicing(data):
-    id, begin, end, record = data['id'], data['begin'], data['end'], data['record']
+    id, begin, end, record = data['id'], data[
+        'begin'], data['end'], data['record']
 
-    print('\nProcessing', id, 'of size', len(record), 'starting in', begin, 'ending', end)
+    print('\nProcessing', id, 'of size', len(record),
+          'starting in', begin, 'ending', end)
 
     if begin < end:
         print('Normal Slicing...')
@@ -24,7 +28,8 @@ def slicing(data):
         print('Reverse Complement...')
         seq = record.seq[end:begin].reverse_complement()
 
-    header = '%s|size%s[%s_to_%s](%s nts)' % (id, len(record), begin, end, len(seq))
+    header = '%s|size%s[%s_to_%s](%s nts)' % (
+        id, len(record), begin, end, len(seq))
 
     return SeqRecord(Seq(str(seq), Alphabet()), id=str(header), description='')
 
@@ -50,7 +55,8 @@ def main():
 
         create_start_time = time()
 
-        reader = list(pandas.read_csv(csv_file, header=None, index_col=None).values)
+        reader = list(pandas.read_csv(
+            csv_file, header=None, index_col=None).values)
 
         for id, begin, end in reader:
             register = {}
@@ -71,7 +77,8 @@ def main():
 
         [SeqIO.write(result, output, 'fasta') for result in results]
 
-        print('\nCheck the results in ', os.path.splitext(sys.argv[2])[0], '.result.fasta\n', sep='')
+        print('\nCheck the results in ', os.path.splitext(
+            sys.argv[2])[0], '.result.fasta\n', sep='')
 
         output.close()
         records.close()

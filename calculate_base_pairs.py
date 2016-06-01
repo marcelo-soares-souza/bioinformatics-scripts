@@ -1,16 +1,14 @@
 #!/usr/bin/python3
 
+# (C) 2016 Marcelo Soares Souza <marcelo.soares@colaborador.embrapa.br>
+# This program is licensed under a LGPLv3 License.
+
 import os
 import sys
 import csv
 import datetime
 from collections import defaultdict
-from collections import Counter
 from time import time
-from Bio import SeqIO
-from Bio.Seq import Seq
-from Bio.SeqRecord import SeqRecord
-from Bio.Alphabet import Alphabet
 
 if len(sys.argv) < 3:
     print('Usage:', str(sys.argv[0]), '[CSV FILE] [PIDENT]')
@@ -46,7 +44,8 @@ else:
 
     result = sorted(dict(result).items())
 
-    output_filename = os.path.splitext(sys.argv[1])[0] + '.result-PIDENT_' + str(arg_pident) + '.' + datetime.datetime.now().strftime('%Y%m%d') + '.txt'
+    output_filename = os.path.splitext(sys.argv[1])[0] + '.result-PIDENT_' + str(
+        arg_pident) + '.' + datetime.datetime.now().strftime('%Y%m%d') + '.txt'
     output = open(output_filename, 'w')
 
     for k, v in result:
@@ -67,7 +66,8 @@ else:
 
         info[k]['size'] = size
 
-        log = 'SSEQID: %s SLEN: %s BPs: %s PIDENT >= %s\n' % (str(k), str(info[k]['slen']), str(size), str(arg_pident))
+        log = 'SSEQID: %s SLEN: %s BPs: %s PIDENT >= %s\n' % (
+            str(k), str(info[k]['slen']), str(size), str(arg_pident))
 
         print(log)
         output.write(log)
@@ -90,7 +90,8 @@ else:
             final_result[id]['slen'] = slen
 
     for k, v in final_result.items():
-        log = '%s %s %s %0.2f\n' % (str(k), str(v['slen']), str(v['bps']), (100 * float(v['bps']) / float(v['slen'])))
+        log = '%s %s %s %0.2f\n' % (str(k), str(v['slen']), str(
+            v['bps']), (100 * float(v['bps']) / float(v['slen'])))
         print(log)
         output.write(log)
 

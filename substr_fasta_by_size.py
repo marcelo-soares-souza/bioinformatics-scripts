@@ -1,9 +1,9 @@
 #!/usr/bin/python3
 
-import os
+# (C) 2016 Marcelo Soares Souza <marcelo.soares@colaborador.embrapa.br>
+# This program is licensed under a LGPLv3 License.
+
 import sys
-import csv
-import datetime
 from time import time
 from Bio import SeqIO
 from Bio.Seq import Seq
@@ -29,7 +29,8 @@ else:
         seq = records[id].seq[:size]
         header = '%s' % (id)
 
-        record = SeqRecord(Seq(str(seq), Alphabet()), id=str(header), description='')
+        record = SeqRecord(Seq(str(seq), Alphabet()),
+                           id=str(header), description='')
 
         SeqIO.write(record, output, 'fasta')
 

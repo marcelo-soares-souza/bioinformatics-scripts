@@ -1,14 +1,12 @@
 #!/usr/bin/python3
 
+# (C) 2016 Marcelo Soares Souza <marcelo.soares@colaborador.embrapa.br>
+# This program is licensed under a LGPLv3 License.
+
 import os
 import sys
-import csv
-import datetime
 from time import time
 from Bio import SeqIO
-from Bio.Seq import Seq
-from Bio.SeqRecord import SeqRecord
-from Bio.Alphabet import Alphabet
 
 if len(sys.argv) < 3:
     print('Usage:', str(sys.argv[0]), '[FASTQ FILE] [KEYWORD]')
@@ -19,8 +17,10 @@ else:
     keyword = str(sys.argv[2])
 
     filename = {}
-    filename['without_keyword'] = os.path.splitext(sys.argv[1])[0] + '.without_' + keyword + '.fastq'
-    filename['with_keyword'] = os.path.splitext(sys.argv[1])[0] + '.with_' + keyword + '.fastq'
+    filename['without_keyword'] = os.path.splitext(
+        sys.argv[1])[0] + '.without_' + keyword + '.fastq'
+    filename['with_keyword'] = os.path.splitext(
+        sys.argv[1])[0] + '.with_' + keyword + '.fastq'
 
     print('\nReading', fastq_filename, 'FASTQ File')
 
@@ -39,10 +39,12 @@ else:
     output['with_keyword'].close()
 
     output['without_keyword'] = open(filename['without_keyword'], 'w')
-    [SeqIO.write(record, output['without_keyword'], 'fastq') for (id, record) in records.items()]
+    [SeqIO.write(record, output['without_keyword'], 'fastq')
+     for (id, record) in records.items()]
     output['without_keyword'].close()
 
-    print('\nCheck the results in ', filename['without_keyword'], ' and ', filename['with_keyword'],'\n', sep='')
+    print('\nCheck the results in ', filename[
+          'without_keyword'], ' and ', filename['with_keyword'], '\n', sep='')
 
     end_time = time()
 
