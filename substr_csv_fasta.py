@@ -28,16 +28,19 @@ else:
         reader = csv.reader(csv_file)
 
         for id, begin, end in reader:
+
+            position_begin = int(begin) - 1
+
             print('\nProcessing', id, 'of size', len(
                 records[id]), 'starting in', begin, 'ending', end)
 
             if int(begin) < int(end):
                 print('Normal Slicing...')
-                seq = records[id].seq[int(begin):int(end)]
+                seq = records[id].seq[int(position_begin):int(end)]
                 id_name = id
             else:
                 print('Reverse Complement...')
-                seq = records[id].seq[int(end):int(begin)].reverse_complement()
+                seq = records[id].seq[int(end):int(position_begin)].reverse_complement()
                 id_name = id + '_RC'
 
             header = '%s|size%s[%s_to_%s](%s nts)' % (
