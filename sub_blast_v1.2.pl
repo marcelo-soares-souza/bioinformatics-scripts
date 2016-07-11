@@ -63,7 +63,6 @@ print "\n\nSub Files Blast ' sub_blast.pl ' finished :) at " . $date . "\n";
 # 1. SUB iniStuff => Initial configuration
 sub iniStuff
 {
-	my $padded_num = '000';
 	$date = `date`;
 	print "\nStarting script at " . $date;
 
@@ -218,11 +217,11 @@ sub buildCmdLines
 	@cmd_blast = {};	
 	for ($i14=1;$i14<=$blast_subfiles;$i14++)
 	{
-		$padded_num = sprintf ("%0${num_digits}d", $i14 );
-		$fasta_temp = "temp_".$padded_num.".fasta";
+		$fasta_temp = "temp_".$i14.".fasta";
 		$blast_out = "$path_to_results/$starttime/blast/gen/" . $fasta_temp;
 		$blast_out =~ s/\.fasta/$config{"BLAST_OUT_SUFFIX"}/;	
 		$cmd_blast{$i14} = $config{BLAST}." -query " . $fasta_temp . " -out " . $blast_out . " -db " . $config{"BLAST_DATABASES_ADDRESS"} . $blast_options . " 2> ".$log_file2." > ".$log_file2;
+		print "$cmd_blast{$i14}\n";
 	}
 }
 
@@ -308,93 +307,78 @@ sub runBlastSubfiles
 	$fasta_file = $config{$fasta};
 
 
-	# Split genome file and run blast in all temp files at the same time:
+	# split genome file and run blast in all temp files at the same time
+
+	# creating list from fasta
 	$fasta_list = $fasta_file;
 	$fasta_list =~ s/.fasta$/.list/;
-	$num_digits = length($blast_subfiles);
+	$cmd_less = "less " . $fasta_path . $fasta_file . " | grep \">\" > " . $fasta_list . "";
+	system( $cmd_less );
 
-	if($config{"FLAG_READS"} eq '0'){
-		# creating list from fasta
-		$cmd_less = "less " . $fasta_path . $fasta_file . " | grep \">\" > " . $fasta_list . "";
-		system( $cmd_less );
-	
-		# loading and counting list
-		@HLIST = {};
-		open ( LIST, "$fasta_list" );
-		$cnt_list = 1;
-		foreach $line (<LIST>)
-		{
-			chomp $line;
-			$HLIST{$cnt_list} = $line;
-			$cnt_list++;
-		}
-		$num_fasta = $cnt_list - 1;
-		print LOG "\n$fasta_file have $num_fasta fastas\n";
-	
-		# split fasta file in up to $blast_subfiles temp fastas
-		# create temp file names
-		@fasta_temp = {};
-		for ($i2=1;$i2<=$blast_subfiles;$i2++)
-		{
-			if ( $i2 <= $num_fasta )
-			{
-				$padded_num = sprintf ("%0${num_digits}d", $i2 );
-				$list_temp{$i2}  = "temp_" . $padded_num . ".list";
-				$LIST_TEMP      = "LIST_TEMP_" . $padded_num;
-				open ( $LIST_TEMP, ">$list_temp{$i2}" ) or die $!;
-			}
-		}
-		# Filling list temp file lists
-		$subfile_control = 1;
-		for ($i3=1;$i3<=$num_fasta;$i3++)
-		{
-			print ".";
-			$padded_num = sprintf ("%0${num_digits}d", $subfile_control );
-			$fasta_temp{$subfile_control} = "temp_" . $padded_num . ".fasta";            
-			$LIST_TEMP       = "LIST_TEMP_" . $subfile_control;
-			# printing fasta names into files
-			# ---------------------------------------------------------------------------------------
-			print $LIST_TEMP "".$HLIST{$i3}."\n";   # $LIST_TEMP = filename; $HLIST{$i3} = fasta name
-			# ---------------------------------------------------------------------------------------
-			if ( $subfile_control < $blast_subfiles )
-			{
-				$subfile_control++;
-			}
-			else
-			{
-				$subfile_control = 1;
-			}
-		}
-	
-		# closing temp file lists
-		for ($i4=1;$i4<=$blast_subfiles;$i4++)
-		{
-			if ( $i4 <= $num_fasta )
-			{
-				$padded_num = sprintf ("%0${num_digits}d", $i4 );
-				$temp = "LIST_TEMP_" . $padded_num;
-				close( $temp );
-			}
-		}
-	
+	# loading and counting list
+	@HLIST = {};
+	open ( LIST, "$fasta_list" );
+	$cnt_list = 1;
+	foreach $line (<LIST>)
+	{
+		chomp $line;
+		$HLIST{$cnt_list} = $line;
+		$cnt_list++;
+	}
+	$num_fasta = $cnt_list - 1;
+	print LOG "\n$fasta_file have $num_fasta fastas\n";
 
-		# create temp file fastas:
-		for ($i12=1;$i12<=$blast_subfiles;$i12++)
+	# split fasta file in up to $blast_subfiles temp fastas
+	# create temp file names
+	@fasta_temp = {};
+	for ($i2=1;$i2<=$blast_subfiles;$i2++)
+	{
+		if ( $i2 <= $num_fasta )
 		{
-			$out_temp = $list_temp{$i12};
-			$out_temp =~ s/.list$/.fasta/;
-			$cmd_ffl = "perl ".$path_to_softwares.$config{FFL}." ".$list_temp{$i12}." ".$fasta_path.$fasta_file." ".$out_temp;
-			print "=";
-			system( $cmd_ffl );
+			$list_temp{$i2}  = "temp_" . $i2 . ".list";
+			$LIST_TEMP      = "LIST_TEMP_" . $i2;
+			open ( $LIST_TEMP, ">$list_temp{$i2}" ) or die $!;
 		}
 	}
-	else{
-		# create temp file fastas:
-		$cmd_wc = "wc -l $fasta_path.$fasta_file";
-		$fasta_file_size = `$cmd_wc`;
-		$temp_file_size = $fasta_file_size / $blast_subfiles;
-		$cmd_split_reads = "split -a $num_digits -d -l $temp_file_size --additional-suffix=.fasta $fasta_file temp_";
-		system($cmd_split_reads);
+	# Filling list temp file lists
+	$subfile_control = 1;
+	for ($i3=1;$i3<=$num_fasta;$i3++)
+	{
+		print ".";
+		$fasta_temp{$subfile_control} = "temp_" . $subfile_control . ".fasta";            
+		$LIST_TEMP       = "LIST_TEMP_" . $subfile_control;
+		# printing fasta names into files
+		# ---------------------------------------------------------------------------------------
+		print $LIST_TEMP "".$HLIST{$i3}."\n";   # $LIST_TEMP = filename; $HLIST{$i3} = fasta name
+		# ---------------------------------------------------------------------------------------
+		if ( $subfile_control < $blast_subfiles )
+		{
+			$subfile_control++;
+		}
+		else
+		{
+			$subfile_control = 1;
+		}
+	}
+
+	# closing temp file lists
+	for ($i4=1;$i4<=$blast_subfiles;$i4++)
+	{
+		if ( $i4 <= $num_fasta )
+		{
+			$temp = "TEMP_" . $i4;
+			close( $temp );
+		}
+	}
+
+	# create temp file fastas
+	for ($i12=1;$i12<=$blast_subfiles;$i12++)
+	{
+		$out_temp = $list_temp{$i12};
+		$out_temp =~ s/.list$/.fasta/;
+		$cmd_ffl = "perl ".$path_to_softwares.$config{FFL}." ".$list_temp{$i12}." ".$fasta_path.$fasta_file." ".$out_temp;
+		print "=";
+		system( $cmd_ffl );
 	}
 
 	# RUN BLAST in all fastas
@@ -413,8 +397,7 @@ sub runBlastSubfiles
 	$blast_final =~ s/\.fasta/$config{"BLAST_OUT_SUFFIX"}/;
 	for ($i15=1;$i15<=$blast_subfiles;$i15++)
 	{
-		$padded_num = sprintf ("%0${num_digits}d", $i15 );
-		$fasta_temp = "temp_".$padded_num.".fasta";
+		$fasta_temp = "temp_".$i15.".fasta";
 		$blast_out = "$path_to_results/$starttime/blast/gen/" . $fasta_temp;
 		$blast_out =~ s/\.fasta/$config{"BLAST_OUT_SUFFIX"}/;	
 		system("cat $blast_out >> $blast_final");
