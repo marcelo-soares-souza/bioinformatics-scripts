@@ -1,4 +1,4 @@
-#!/usr/bin/python3
+#!/usr/bin/env python3
 
 # (C) 2016 Marcelo Soares Souza <marcelo.soares@colaborador.embrapa.br>
 # This program is licensed under a LGPLv3 License.
@@ -29,7 +29,6 @@ else:
     filename['bwa_samtools'] = prefix + '_' + 'bwa_samtools.csv'
 
     sequences = defaultdict(lambda: defaultdict(list))
-    # sequences = defaultdict(list)
 
     print('Using Prefix', prefix, '\n')
 
@@ -45,22 +44,27 @@ else:
                 sequences[sequence][position].append(suffix)
 
 
-    s = defaultdict(list)
+    tools = defaultdict(list)
 
     for sequence, list in sequences.items():
         for key, suffix in list.items():
-            s[', '.join(suffix)].append(sequence + ' ' + key)
+            tools[', '.join(suffix)].append(sequence + ' ' + key)
 
-    ss = sorted(s, key=len, reverse=True)
+    tools_sorted = sorted(tools, key=len, reverse=True)
 
-    for x in ss:
-        print('\n')
-        print(x)
-        print('\n')
-        for a in s[x]:
-          print(a)
-        print('\n')
+    output = open(prefix + '.result', 'w')
+
+    for tool in tools_sorted:
+        output.write('Found on %s\n\n' % (tool))
+
+        for seq_pos in tools[tool]:
+            output.write("%s\n" % (seq_pos))
+
+        output.write('\n')
+
+    output.close()
 
     end_time = time()
+
 
     print('\nTook %.3f seconds...\n' % (end_time - start_time))
