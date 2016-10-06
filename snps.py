@@ -55,7 +55,7 @@ else:
     output = open(prefix + '.result', 'w')
 
     for tool in tools_sorted:
-        output.write('Found on %s\n\n' % (tool))
+        output.write('Found on %s - %s\n\n' % (tool, len(tools[tool])))
 
         for seq_pos in tools[tool]:
             output.write("%s\n" % (seq_pos))
