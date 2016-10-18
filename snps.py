@@ -22,11 +22,11 @@ else:
 
     filename = {}
     filename['bowtie_freebayes'] = prefix + '_' + 'bowtie_freebayes.csv'
-    filename['bowtie_GATK'] = prefix + '_' + 'bowtie_GATK.csv'
-    filename['bowtie_samtools'] = prefix + '_' + 'bowtie_samtools.csv'
-    filename['bwa_freebayes'] = prefix + '_' + 'bwa_freebayes.csv'
-    filename['bwa_GATK'] = prefix + '_' + 'bwa_GATK.csv'
-    filename['bwa_samtools'] = prefix + '_' + 'bwa_samtools.csv'
+    filename['bowtie_GATK']      = prefix + '_' + 'bowtie_GATK.csv'
+    filename['bowtie_samtools']  = prefix + '_' + 'bowtie_samtools.csv'
+    filename['bwa_freebayes']    = prefix + '_' + 'bwa_freebayes.csv'
+    filename['bwa_GATK']         = prefix + '_' + 'bwa_GATK.csv'
+    filename['bwa_samtools']     = prefix + '_' + 'bwa_samtools.csv'
 
     sequences = defaultdict(lambda: defaultdict(list))
 
@@ -43,7 +43,6 @@ else:
 
                 sequences[sequence][position].append(suffix)
 
-
     tools = defaultdict(list)
 
     for sequence, list in sequences.items():
@@ -55,7 +54,9 @@ else:
     output = open(prefix + '.result', 'w')
 
     for tool in tools_sorted:
-        output.write('Found on %s - %s\n\n' % (tool, len(tools[tool])))
+        header = ','.join(sorted(tool.strip().split(','), key=len, reverse=True)).strip()
+
+        output.write('Found on %s - %s\n\n' % (header, len(tools[tool])))
 
         for seq_pos in tools[tool]:
             output.write("%s\n" % (seq_pos))
