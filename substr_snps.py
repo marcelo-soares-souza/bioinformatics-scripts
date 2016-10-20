@@ -37,7 +37,7 @@ else:
             end = int(pos) + up_down_value
 
             seq = str(records[chr].seq[int(begin):int(end)])
-            seq = seq[:35] + '[' + ref +  '/' + alt+ ']' + seq[35:]
+            seq = seq[:up_down_value] + '[' + ref +  '/' + alt+ ']' + seq[up_down_value:]
             snpid = '%s_%s_%s' % (organism, chr, pos)
             info = '%s;%s;%s;%s\n' % (snpid, seq, chr, pos)
 
