@@ -93,6 +93,7 @@ else:
     output[3] = open(prefix + '.3.csv', 'w')
     output[2] = open(prefix + '.2.csv', 'w')
     output[1] = open(prefix + '.1.csv', 'w')
+    output[0] = open(prefix + '.csv', 'w')
 
     for k in sorted(seqs, key=lambda x: (x.split()[0], int(x.split()[1]))):
 
@@ -106,6 +107,7 @@ else:
             col = "%s;%s\n" % (seqs[k], str((pos - last_pos)))
 
         output[tool].write(col)
+        output[0].write(col)
 
         last_chr = chr
         last_pos = pos
