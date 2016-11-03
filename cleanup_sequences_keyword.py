@@ -18,7 +18,7 @@ else:
 
     filename = {}
 
-    extension = os.path.splitext(sys.argv[1])[1]
+    extension = os.path.splitext(sys.argv[1])[1].replace('.', '')
 
     filename['without_keyword'] = os.path.splitext(
         sys.argv[1])[0] + '.without_' + keyword + '.' + extension
