@@ -6,6 +6,8 @@
 import os
 import sys
 import csv
+import re
+import operator
 from time import time
 from Bio import SeqIO
 
@@ -30,12 +32,15 @@ else:
     output = {}
     output['with_keyword'] = open(filename['with_keyword'], 'w')
 
+    records_sorted = sorted(records.items(), key=lambda v: int(v[0].split("_")[1]), reverse=False)
+
     with open(csv_filename, 'r') as csv_file:
         reader = csv.reader(csv_file)
         for keyword in reader:
-            kw = ''.join(keyword)
-            for record in list(records.items()):
-                if kw.lower() in record[1].description.lower():
+            kw = ''.join(keyword) + '\n'
+
+            for record in records_sorted:
+                if kw.lower().find(record[1].description.lower()) != -1:
                     print('\nRemoving', record[1].description)
                     SeqIO.write(record[1], output['with_keyword'], 'fasta')
                     del records[record[0]]
@@ -43,8 +48,7 @@ else:
     output['with_keyword'].close()
 
     output['without_keyword'] = open(filename['without_keyword'], 'w')
-    [SeqIO.write(record, output['without_keyword'], 'fasta')
-     for (id, record) in records.items()]
+    [SeqIO.write(record, output['without_keyword'], 'fasta') for (id, record) in records_sorted]
     output['without_keyword'].close()
 
     print('\nCheck the results in ', filename[
