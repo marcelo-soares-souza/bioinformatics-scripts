@@ -37,18 +37,22 @@ else:
     with open(csv_filename, 'r') as csv_file:
         reader = csv.reader(csv_file)
         for keyword in reader:
-            kw = ''.join(keyword) + '\n'
+            kw = ''.join(keyword)
 
             for record in records_sorted:
-                if kw.lower().find(record[1].description.lower()) != -1:
-                    print('\nRemoving', record[1].description)
+                # if kw.lower().find(record[1].id.lower()) != -1:
+                if record[1].id.lower() == kw.lower():
+                    print('\nRemoving', ' ', kw.lower(), ' ', record[1].id)
                     SeqIO.write(record[1], output['with_keyword'], 'fasta')
                     del records[record[0]]
 
     output['with_keyword'].close()
 
     output['without_keyword'] = open(filename['without_keyword'], 'w')
-    [SeqIO.write(record, output['without_keyword'], 'fasta') for (id, record) in records_sorted]
+
+    records_without = sorted(records.items(), key=lambda v: int(v[0].split("_")[1]), reverse=False)
+
+    [SeqIO.write(record, output['without_keyword'], 'fasta') for (id, record) in records_without]
     output['without_keyword'].close()
 
     print('\nCheck the results in ', filename[
