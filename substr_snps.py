@@ -1,6 +1,6 @@
-#!/usr/bin/python3
+#!/usr/bin/env python3
 
-# (C) 2016 Marcelo Soares Souza <marcelo.soares@colaborador.embrapa.br>
+# (C) 2016 Marcelo Soares Souza <marcelo@riseup.net>
 # This program is licensed under a LGPLv3 License.
 
 import os
@@ -9,9 +9,6 @@ import csv
 import datetime
 from time import time
 from Bio import SeqIO
-from Bio.Seq import Seq
-from Bio.SeqRecord import SeqRecord
-from Bio.Alphabet import Alphabet
 
 if len(sys.argv) < 4:
     print('Usage:', str(
@@ -37,13 +34,13 @@ else:
             end = int(pos) + up_down_value
 
             seq = str(records[chr].seq[int(begin):int(end)])
-            seq = seq[:up_down_value] + '[' + ref +  '/' + alt+ ']' + seq[up_down_value:]
+            seq = seq[:up_down_value] + '[' + ref + '/' + alt + ']' + seq[up_down_value:]
             snpid = '%s_%s_%s' % (organism, chr, pos)
             info = '%s;%s;%s;%s\n' % (snpid, seq, chr, pos)
 
             output.write(info)
 
-    print('\nCheck the results in ', os.path.splitext( sys.argv[2])[0], '.result.csv\n', sep='')
+    print('\nCheck the results in ', os.path.splitext(sys.argv[2])[0], '.result.csv\n', sep='')
 
     output.close()
     records.close()

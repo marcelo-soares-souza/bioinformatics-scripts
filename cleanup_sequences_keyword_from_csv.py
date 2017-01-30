@@ -1,13 +1,11 @@
-#!/usr/bin/python3
+#!/usr/bin/env python3
 
-# (C) 2016 Marcelo Soares Souza <marcelo.soares@colaborador.embrapa.br>
+# (C) 2016 Marcelo Soares Souza <marcelo@riseup.net>
 # This program is licensed under a LGPLv3 License.
 
 import os
 import sys
 import csv
-import re
-import operator
 from time import time
 from Bio import SeqIO
 

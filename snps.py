@@ -1,17 +1,17 @@
 #!/usr/bin/env python3
 
-# (C) 2016 Marcelo Soares Souza <marcelo.soares@colaborador.embrapa.br>
+# (C) 2016 Marcelo Soares Souza <marcelo@riseup.net>
 # This program is licensed under a LGPLv3 License.
 
-import os
 import sys
 import csv
-import datetime
 from collections import defaultdict
 from time import time
 
+
 def getKey(item):
     return item[1]
+
 
 if len(sys.argv) < 2:
     print('Usage:', str(sys.argv[0]), '[PREFIX FILENAME]')
@@ -22,11 +22,11 @@ else:
 
     filename = {}
     filename['bowtie_freebayes'] = prefix + '_' + 'bowtie_freebayes.csv'
-    filename['bowtie_GATK']      = prefix + '_' + 'bowtie_GATK.csv'
-    filename['bowtie_samtools']  = prefix + '_' + 'bowtie_samtools.csv'
-    filename['bwa_freebayes']    = prefix + '_' + 'bwa_freebayes.csv'
-    filename['bwa_GATK']         = prefix + '_' + 'bwa_GATK.csv'
-    filename['bwa_samtools']     = prefix + '_' + 'bwa_samtools.csv'
+    filename['bowtie_GATK'] = prefix + '_' + 'bowtie_GATK.csv'
+    filename['bowtie_samtools'] = prefix + '_' + 'bowtie_samtools.csv'
+    filename['bwa_freebayes'] = prefix + '_' + 'bwa_freebayes.csv'
+    filename['bwa_GATK'] = prefix + '_' + 'bwa_GATK.csv'
+    filename['bwa_samtools'] = prefix + '_' + 'bwa_samtools.csv'
 
     sequences = defaultdict(lambda: defaultdict(list))
 
@@ -66,6 +66,5 @@ else:
     output.close()
 
     end_time = time()
-
 
     print('\nTook %.3f seconds...\n' % (end_time - start_time))

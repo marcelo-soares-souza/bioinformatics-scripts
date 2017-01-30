@@ -1,13 +1,10 @@
 #!/usr/bin/env python3
 
-# (C) 2016 Marcelo Soares Souza <marcelo.soares@colaborador.embrapa.br>
+# (C) 2016 Marcelo Soares Souza <marcelo@riseup.net>
 # This program is licensed under a LGPLv3 License.
 
-import os
 import sys
 import csv
-import datetime
-import operator
 from collections import defaultdict
 from time import time
 from Bio import SeqIO
@@ -15,6 +12,7 @@ from Bio import SeqIO
 
 def getKey(item):
     return item[1]
+
 
 if len(sys.argv) < 4:
     print('Usage:', str(sys.argv[0]), '[PREFIX FILENAME] [FASTA] [UP/DO VALUE]')
@@ -25,11 +23,11 @@ else:
 
     filename = {}
     filename['bowtie_freebayes'] = prefix + '_' + 'bowtie_freebayes.csv'
-    filename['bowtie_GATK']      = prefix + '_' + 'bowtie_GATK.csv'
-    filename['bowtie_samtools']  = prefix + '_' + 'bowtie_samtools.csv'
-    filename['bwa_freebayes']    = prefix + '_' + 'bwa_freebayes.csv'
-    filename['bwa_GATK']         = prefix + '_' + 'bwa_GATK.csv'
-    filename['bwa_samtools']     = prefix + '_' + 'bwa_samtools.csv'
+    filename['bowtie_GATK'] = prefix + '_' + 'bowtie_GATK.csv'
+    filename['bowtie_samtools'] = prefix + '_' + 'bowtie_samtools.csv'
+    filename['bwa_freebayes'] = prefix + '_' + 'bwa_freebayes.csv'
+    filename['bwa_GATK'] = prefix + '_' + 'bwa_GATK.csv'
+    filename['bwa_samtools'] = prefix + '_' + 'bwa_samtools.csv'
     organism = prefix.split('_')[0]
 
     output = {}
@@ -61,7 +59,7 @@ else:
 
                 if begin > 0:
                     seq = str(records[chr].seq[int(begin):int(end)])
-                    seq = seq[:up_down_value] + '[' + ref +  '/' + alt+ ']' + seq[up_down_value:]
+                    seq = seq[:up_down_value] + '[' + ref + '/' + alt + ']' + seq[up_down_value:]
                     info = '%s;%s;%s;%s' % (snp_id, seq, chr, pos)
                     seq_pos = "%s %s" % (chr, pos)
                     sequences[seq_pos] = info
@@ -85,7 +83,6 @@ else:
 
     last_pos = pos = 0
     last_chr = chr = ''
-
 
     output[6] = open(prefix + '.6.csv', 'w')
     output[5] = open(prefix + '.5.csv', 'w')
@@ -112,7 +109,6 @@ else:
         last_chr = chr
         last_pos = pos
 
-
     output[6].close()
     output[5].close()
     output[4].close()
@@ -121,6 +117,5 @@ else:
     output[1].close()
 
     end_time = time()
-
 
     print('\nTook %.3f seconds...\n' % (end_time - start_time))

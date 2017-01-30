@@ -1,15 +1,14 @@
-#!/usr/bin/python3
+#!/usr/bin/env python3
 
-# (C) 2016 Marcelo Soares Souza <marcelo.soares@colaborador.embrapa.br>
+# (C) 2016 Marcelo Soares Souza <marcelo@riseup.net>
 # This program is licensed under a LGPLv3 License.
 
-import os
 import sys
 import csv
-import datetime
 from collections import defaultdict
 from time import time
 from math import ceil
+
 
 def takespread(sequence, num):
     length = float(len(sequence))
@@ -43,10 +42,10 @@ else:
     info = sorted(dict(info).items())
 
     for k, v in info:
-      print('Chromosome:', k, '\n')
-      data = takespread(v, 10)
+        print('Chromosome:', k, '\n')
+        data = takespread(v, 10)
 
-      for i in data:
-          print("SNP: %s" % (snp[i]))
+        for i in data:
+            print("SNP: %s" % (snp[i]))
 
-      print('\n')
+        print('\n')

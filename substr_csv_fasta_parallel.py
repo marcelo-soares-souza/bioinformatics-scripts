@@ -1,6 +1,6 @@
-#!/usr/bin/python3
+#!/usr/bin/env python3
 
-# (C) 2016 Marcelo Soares Souza <marcelo.soares@colaborador.embrapa.br>
+# (C) 2016 Marcelo Soares Souza <marcelo@riseup.net>
 # This program is licensed under a LGPLv3 License.
 
 import os
@@ -86,6 +86,7 @@ def main():
         end_time = time()
 
         print('Took %.3f seconds...\n' % (end_time - start_time))
+
 
 if __name__ == '__main__':
     main()
