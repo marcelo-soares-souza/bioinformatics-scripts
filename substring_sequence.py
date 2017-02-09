@@ -13,25 +13,44 @@ from Bio.Seq import Seq
 from Bio.SeqRecord import SeqRecord
 from Bio.Alphabet import Alphabet
 
-@click.command()
-@click.option('--csv', prompt='CSV File', help='CSV File')
-@click.option('--input', prompt='FASTA or FASTQ File', help='FASTA or FASTQ File')
-@click.option('--type', prompt='FASTA or FASTQ Type', help='--type FASTA or --type FASTQ')
-@click.option('--output', prompt='Output File', help='Output File')
-@click.option('--delimiter', prompt='Delimiter in CSV File', help='Delimiter in CSV File')
+def verify_parameters(csv, input, output):
+    exit = 0
 
-def substring_sequence(arg_csv, arg_input, arg_type, arg_output, arg_delimiter):
+    if csv == None:
+        print("Please inform the CSV File with --csv option")
+        exit = 1
+
+    if input == None:
+        print("Please inform the Input File with --input option")
+        exit = 1
+
+    if output == None:
+        print("Please inform the Output File with --output option")
+        exit = 1
+
+    if exit == 1:
+         sys.exit()
+
+@click.command()
+@click.option('--csv', '-c', help='CSV File')
+@click.option('--input', '-i', help='FASTA/FASTQ File')
+@click.option('--output', '-o', help='Output File')
+@click.option('--format', '-f', default='fasta', help='--format fasta or --format fastq')
+@click.option('--delimiter', '-d', default=';', help='Delimiter in CSV File')
+
+def substring_sequence(csv, input, output, format,  delimiter):
+    verify_parameters(csv, input, output)
+
     start_time = time()
 
-    csv_file = arg_csv
-    records = SeqIO.index(arg_input, arg_type.lower())
-    output = open(arg_output, "w")
+    records = SeqIO.index(input, format.lower())
+    output = open(output, "w")
 
-    print('Using', csv_file, 'CSV Table and', arg_input, arg_type, ' File')
+    print('Using', csv, 'CSV Table and', input, format, ' File')
 
-    with open(csv_file, 'r') as csv_file:
+    with open(csv, 'r') as csv_file:
         reader = csv.reader(csv_file)
-        reader = csv.reader(csv_file, delimiter=arg_delimiter)
+        reader = csv.reader(csv_file, delimiter=delimiter)
 
         for id, begin, end in reader:
 
@@ -63,9 +82,7 @@ def substring_sequence(arg_csv, arg_input, arg_type, arg_output, arg_delimiter):
     output.close()
     records.close()
 
-    end_time = time()
-
-    print('Took %.3f seconds...\n' % (end_time - start_time))
+    print('Took %.3f seconds...\n' % (time() - start_time))
 
 if __name__ == '__main__':
     substring_sequence()
