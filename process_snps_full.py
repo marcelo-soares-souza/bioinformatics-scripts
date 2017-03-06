@@ -60,7 +60,7 @@ else:
                 if begin > 0:
                     seq = str(records[chr].seq[int(begin):int(end)])
                     seq = seq[:up_down_value] + '[' + ref + '/' + alt + ']' + seq[up_down_value:]
-                    info = '%s;%s;%s;%s' % (snp_id, seq, chr, pos)
+                    info = '%s;%s;%s;%s;%s;%s' % (snp_id, seq, chr, pos, ref, alt)
                     seq_pos = "%s %s" % (chr, pos)
                     sequences[seq_pos] = info
                     chrs[chr][pos].append(suffix)
