@@ -4,10 +4,10 @@
 # This program is licensed under a LGPLv3 License.
 
 import sys
-# import csv
-import click
-
+from csv import reader
 from time import time
+
+import click
 from Bio import SeqIO
 from Bio.Seq import Seq
 from Bio.SeqRecord import SeqRecord
@@ -45,28 +45,27 @@ def substring_sequence(csv, input, output, format,  delimiter):
     start_time = time()
 
     records = SeqIO.index(input, format.lower())
-    output = open(output, "w")
+    output_io = open(output, "w")
 
-    print('Using', csv, 'CSV Table and', input, format, ' File')
+    print('Using', csv, 'CSV Table and', input, format.upper(), ' File')
 
-    with open(csv, 'r') as csv_file:
-        reader = csv.reader(csv_file)
-        reader = csv.reader(csv_file, delimiter=delimiter)
+    with open(csv, 'r') as csv_io:
+        data = reader(csv_io, delimiter=';')
 
-        for id, begin, end in reader:
-
-            position_begin = int(begin) - 1
+        for id, begin, end in data:
+            begin = int(begin)
+            end = int(end)
 
             print('\nProcessing', id, 'of size', len(
                 records[id]), 'starting in', begin, 'ending', end)
 
             if int(begin) < int(end):
                 print('Normal Slicing...')
-                seq = records[id].seq[int(position_begin):int(end)]
+                seq = records[id].seq[int(begin - 1):int(end)]
                 id_name = id
             else:
                 print('Reverse Complement...')
-                seq = records[id].seq[int(end):int(position_begin)].reverse_complement()
+                seq = records[id].seq[int(end - 1):int(begin)].reverse_complement()
                 id_name = id + '_RC'
 
             header = '%s|size%s[%s_to_%s](%s nts)' % (
@@ -76,11 +75,11 @@ def substring_sequence(csv, input, output, format,  delimiter):
 
             record = SeqRecord(Seq(str(seq), Alphabet()), id=str(header), description='')
 
-            SeqIO.write(record, output, 'fasta')
+            SeqIO.write(record, output_io, 'fasta')
 
-    print('\nCheck the results in ', sys.argv[3], '\n', sep='')
+    print('\nCheck the results in ', output, '\n', sep='')
 
-    output.close()
+    output_io.close()
     records.close()
 
     print('Took %.3f seconds...\n' % (time() - start_time))
