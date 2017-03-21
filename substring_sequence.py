@@ -4,7 +4,7 @@
 # This program is licensed under a LGPLv3 License.
 
 import sys
-import csv
+# import csv
 import click
 
 from time import time
@@ -13,23 +13,25 @@ from Bio.Seq import Seq
 from Bio.SeqRecord import SeqRecord
 from Bio.Alphabet import Alphabet
 
+
 def verify_parameters(csv, input, output):
     exit = 0
 
-    if csv == None:
+    if csv is None:
         print("Please inform the CSV File with --csv option")
         exit = 1
 
-    if input == None:
+    if input is None:
         print("Please inform the Input File with --input option")
         exit = 1
 
-    if output == None:
+    if output is None:
         print("Please inform the Output File with --output option")
         exit = 1
 
     if exit == 1:
-         sys.exit()
+        sys.exit()
+
 
 @click.command()
 @click.option('--csv', '-c', help='CSV File')
@@ -37,7 +39,6 @@ def verify_parameters(csv, input, output):
 @click.option('--output', '-o', help='Output File')
 @click.option('--format', '-f', default='fasta', help='--format fasta or --format fastq')
 @click.option('--delimiter', '-d', default=';', help='Delimiter in CSV File')
-
 def substring_sequence(csv, input, output, format,  delimiter):
     verify_parameters(csv, input, output)
 
@@ -83,6 +84,7 @@ def substring_sequence(csv, input, output, format,  delimiter):
     records.close()
 
     print('Took %.3f seconds...\n' % (time() - start_time))
+
 
 if __name__ == '__main__':
     substring_sequence()
