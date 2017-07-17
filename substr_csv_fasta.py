@@ -1,6 +1,6 @@
-#!/usr/bin/env python3
+#!/usr/bin/python3
 
-# (C) 2016 Marcelo Soares Souza <marcelo@riseup.net>
+# (C) 2016 Marcelo Soares Souza <marcelo.soares@colaborador.embrapa.br>
 # This program is licensed under a LGPLv3 License.
 
 import sys
@@ -25,7 +25,7 @@ else:
     print('Using', csv_file, 'CSV Table and', fasta_file, 'FASTA File')
 
     with open(csv_file, 'r') as csv_file:
-        reader = csv.reader(csv_file)
+        reader = csv.reader(csv_file, delimiter=';')
 
         for id, begin, end in reader:
 
@@ -43,8 +43,10 @@ else:
                 seq = records[id].seq[int(end):int(position_begin)].reverse_complement()
                 id_name = id + '_RC'
 
-            header = '%s|size%s[%s_to_%s](%s nts)' % (
-                id_name, len(records[id]), begin, end, len(seq))
+            # header = '%s|size%s[%s_to_%s](%s nts)' % (
+            #    id_name, len(records[id]), begin, end, len(seq))
+
+            header = '%s' % (id_name)
 
             print(header)
 

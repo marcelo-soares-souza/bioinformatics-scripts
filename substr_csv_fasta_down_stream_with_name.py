@@ -32,14 +32,12 @@ else:
 
         reader = csv.reader(csv_file, delimiter=';')
 
-        for id, begin, end in reader:
+        for name, id, begin, end in reader:
             end = int(begin)
             begin = int(begin) - int(down_value)
 
             if begin < 0:
                 begin = 0
-
-            print(id, begin)
 
             print('\nProcessing', id, 'of size', len(records[id]), 'starting in', begin, 'ending', end)
 
@@ -49,7 +47,7 @@ else:
 
             # header = '%s|size%s[%s_to_%s](%s nts)' % (id_name, len(records[id]), begin, end, len(seq))
             # print(header)
-            header = '%s' % (id_name)
+            header = '%s' % (name)
 
             record = SeqRecord(Seq(str(seq), Alphabet()), id=str(header), description='')
 

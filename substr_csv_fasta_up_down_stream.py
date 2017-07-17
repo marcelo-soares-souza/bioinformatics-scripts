@@ -1,6 +1,6 @@
-#!/usr/bin/env python3
+#!/usr/bin/python3
 
-# (C) 2016 Marcelo Soares Souza <marcelo@riseup.net>
+# (C) 2016 Marcelo Soares Souza <marcelo.soares@colaborador.embrapa.br>
 # This program is licensed under a LGPLv3 License.
 
 import os
@@ -31,15 +31,18 @@ else:
           'FASTA File', 'With Up/Down Stream of', up_down_value)
 
     with open(csv_file, 'r') as csv_file:
-        reader = csv.reader(csv_file)
+        reader = csv.reader(csv_file, delimiter=';')
 
         for id, begin, end in reader:
             if int(begin) < int(end):
                 begin = int(begin) - up_down_value
-                end = int(end) + up_down_value
+                end = int(end) # + up_down_value
             else:
                 begin = int(begin) + up_down_value
-                end = int(end) - up_down_value
+                end = int(end) # - up_down_value
+
+            if begin < 0:
+                begin = 0
 
             print('\nProcessing', id, 'of size', len(
                 records[id]), 'starting in', begin, 'ending', end)
@@ -53,8 +56,9 @@ else:
                 seq = records[id].seq[int(end):int(begin)].reverse_complement()
                 id_name = id + '_RC'
 
-            header = '%s|size%s[%s_to_%s](%s nts)' % (
-                id_name, len(records[id]), begin, end, len(seq))
+            #header = '%s|size%s[%s_to_%s](%s nts)' % (
+            #    id_name, len(records[id]), begin, end, len(seq))
+            header = str(id_name)
 
             print(header)
 
